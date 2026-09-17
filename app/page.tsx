@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import { getProjectsWithStats } from '@/app/actions/project';
 import { getAuthSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import AppHeader from '@/components/AppHeader';
 import DeleteProjectButton from '@/components/DeleteProjectButton';
-import LogoutButton from '@/components/LogoutButton';
 
 export const metadata: Metadata = {
   title: '我的灵感档案室',
@@ -46,31 +46,18 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-academia-bg text-academia-parchment font-sans selection:bg-academia-gold/20">
-      <header className="w-full px-6 py-4 border-b border-academia-border bg-academia-bg/80 backdrop-blur-md sticky top-0 z-50 flex justify-between items-center">
-        <span className="text-xl font-serif font-bold tracking-widest text-academia-gold">
-          FANFIC COPILOT
-        </span>
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-academia-muted">
-            👋 {user?.name || user?.email?.split('@')[0] || '创作者'}
-          </span>
-          <Link
-            href="/project/import"
-            className="text-xs text-academia-muted hover:text-academia-parchment px-3 py-2 transition-colors border border-academia-border rounded-lg hover:bg-academia-surface"
-            aria-label="导入短篇小说并自动创建项目"
-          >
-            📥 导入
-          </Link>
-          <Link
-            href="/project/new"
-            className="bg-academia-gold text-academia-bg px-4 py-2 rounded-lg text-sm font-bold tracking-wide hover:opacity-90 transition-all shadow-[0_0_15px_rgba(232,125,155,0.15)]"
-            aria-label="创建新的同人小说项目"
-          >
-            + 开新坑
-          </Link>
-          <LogoutButton />
-        </div>
-      </header>
+      <AppHeader
+        breadcrumbs={[{ label: '我的项目' }]}
+        username={`👋 ${user?.name || user?.email?.split('@')[0] || '创作者'}`}
+      >
+        <Link
+          href="/project/import"
+          className="text-xs text-academia-muted hover:text-academia-parchment px-3 py-2 transition-colors border border-academia-border rounded-lg hover:bg-academia-surface"
+          aria-label="导入短篇小说并自动创建项目"
+        >
+          📥 导入
+        </Link>
+      </AppHeader>
 
       <main className="max-w-5xl mx-auto p-6 md:p-12 space-y-8">
         <div className="space-y-2 border-b border-academia-border pb-4">
@@ -141,9 +128,18 @@ export default async function DashboardPage() {
                       <span className="text-academia-gold/50">尚未开始创作</span>
                     )}
                   </div>
-                  <span className="text-[10px] text-academia-muted/60">
-                    {getRelativeTime(proj.updatedAt)}
-                  </span>
+                  <div className="flex items-center gap-3 text-[10px] text-academia-muted/60">
+                    {proj.isPublished && (
+                      <>
+                        <span title="点赞">❤️ {proj.kudosCount}</span>
+                        <span title="收藏">🔖 {proj.bookmarkCount}</span>
+                        <span title="评论">💬 {proj.commentCount}</span>
+                      </>
+                    )}
+                    {!proj.isPublished && (
+                      <span>{getRelativeTime(proj.updatedAt)}</span>
+                    )}
+                  </div>
                 </div>
 
                 <DeleteProjectButton projectId={proj.id} projectName={proj.title} />

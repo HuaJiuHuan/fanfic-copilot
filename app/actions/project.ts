@@ -3,11 +3,12 @@
 import { cache } from 'react';
 import { db } from '@/lib/db';
 import { projects, outlines } from '@/lib/db-schema';
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 import { getProjectsWithStats as fetchProjectsWithStats } from '@/lib/repositories/project.repository';
 import type { ProjectWithStats } from '@/lib/repositories/project.repository';
 import { getUserIdOrThrow } from '@/lib/server/auth-guard';
+import type { Project } from '@/lib/types';
 
 export { type ProjectWithStats };
 
@@ -31,7 +32,7 @@ export async function getProjectById(id: string) {
   const project = result[0] || null;
   if (!project) return null;
   if (project.userId !== userId) return null;
-  return project;
+  return project as Project;
 }
 
 export async function createProjectAction(formData: FormData) {
@@ -75,6 +76,15 @@ export async function setActiveOutlineAction(projectId: string, outlineId: strin
     return { success: false, error: '切换大纲失败，请重试。' };
   }
 }
+
+export const getPublicProject = cache(async (id: string) => {
+  const [project] = await db
+    .select()
+    .from(projects)
+    .where(and(eq(projects.id, id), eq(projects.isPublished, true)))
+    .limit(1);
+  return project || null;
+});
 
 export async function getOutlinesByProject(projectId: string) {
   const userId = await getUserIdOrThrow();

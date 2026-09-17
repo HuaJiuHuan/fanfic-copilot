@@ -3,12 +3,12 @@ import { db } from '@/lib/db';
 import { outlines } from '@/lib/db-schema';
 import { desc, eq } from 'drizzle-orm';
 import { notFound, redirect } from 'next/navigation';
-import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getAuthSession } from '@/lib/auth';
+import AppHeader from '@/components/AppHeader';
 import WorkspaceClient from './WorkspaceClient';
 import GenerateButton from '@/components/GenerateButton';
-import LogoutButton from '@/components/LogoutButton';
+import PublishButton from '@/components/PublishButton';
 import type { OutlineRecord } from '@/lib/types';
 
 interface Props {
@@ -33,7 +33,8 @@ export default async function ProjectWorkspacePage({ params }: { params: { id: s
     redirect('/login');
   }
 
-  const userId = (session.user as any)?.id;
+  const user = session.user as any;
+  const userId = user?.id;
   const { id } = await params;
 
   const project = await getProjectById(id);
@@ -46,22 +47,25 @@ export default async function ProjectWorkspacePage({ params }: { params: { id: s
     .orderBy(desc(outlines.createdAt))) as OutlineRecord[];
 
   const activeOutlineId = project.activeOutlineId || historyOutlines[0]?.id || null;
+  const activeOutline = historyOutlines.find((o) => o.id === activeOutlineId) || null;
 
   return (
     <div className="min-h-screen bg-academia-bg text-academia-parchment font-sans flex flex-col selection:bg-academia-gold/20">
-      <header className="w-full px-6 py-4 border-b border-academia-border bg-academia-bg/80 backdrop-blur-md sticky top-0 z-50 flex justify-between items-center">
-        <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className="text-xs text-academia-muted hover:text-academia-parchment transition-colors"
-          >
-            ← 大厅
-          </Link>
-          <span className="w-px h-4 bg-academia-border"></span>
-          <span className="text-sm font-serif font-bold text-academia-gold">{project.title}</span>
-        </div>
-        <LogoutButton />
-      </header>
+      <AppHeader
+        breadcrumbs={[
+          { label: '我的项目', href: '/' },
+          { label: project.title },
+        ]}
+        username={user?.name || user?.email?.split('@')[0] || '创作者'}
+      >
+        <PublishButton
+          projectId={project.id}
+          isPublished={project.isPublished || false}
+          storyUrl={`/story/${project.id}`}
+          outlineTitle={activeOutline?.content?.title}
+          outlineVersion={activeOutline?.version}
+        />
+      </AppHeader>
 
       <main className="flex-1 w-full max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
         <aside className="lg:col-span-3 space-y-6">
