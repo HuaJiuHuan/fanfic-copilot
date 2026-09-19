@@ -42,13 +42,7 @@ export type Scene = StoryOutline['acts'][number]['scenes'][number];
 export type Act = StoryOutline['acts'][number];
 
 export interface TagsData {
-  preset: {
-    fandom: string[];
-    relationship: string[];
-    category: string;
-    rating: string;
-    genre: string[];
-  };
+  preset: string[];
   free: string[];
 }
 

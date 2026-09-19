@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { publishProject, unpublishProject } from '@/app/actions/publish';
 import { useRouter } from 'next/navigation';
@@ -14,206 +14,63 @@ interface PublishButtonProps {
   outlineVersion?: number | null;
 }
 
-const PRESET_OPTIONS = {
-  fandom: [
-    '魔道祖师',
-    '天官赐福',
-    '人渣反派自救系统',
-    '原神',
-    '崩坏：星穹铁道',
-    '咒术回战',
-    '排球少年',
-    '全职高手',
-    '盗墓笔记',
-    'MyGo',
-    '其他',
-  ],
-  category: ['BL', 'GL', 'BG', '无差', '粮食'],
-  rating: ['全年龄', 'PG', 'R', 'NC-17'],
-  genre: [
-    'HE',
-    'BE',
-    '开放式结局',
-    'ABO',
-    '哨向',
-    '日常甜饼',
-    '虐文',
-    '悬疑',
-    '搞笑',
-    '正剧',
-    '原著向',
-    '架空',
-    '校园',
-    '娱乐圈',
-    '修仙',
-  ],
-} as const;
+const PRESET_TAGS: string[] = [
+  '魔道祖师',
+  '天官赐福',
+  '人渣反派自救系统',
+  '原神',
+  '崩坏：星穹铁道',
+  '咒术回战',
+  '排球少年',
+  '全职高手',
+  '盗墓笔记',
+  '鬼灭之刃',
+  '文豪野犬',
+  '名侦探柯南',
+  '进击的巨人',
+  'MyGo',
+  'BL',
+  'GL',
+  'BG',
+  '无差',
+  '粮食',
+  '全年龄',
+  'PG',
+  'R',
+  'NC-17',
+  'HE',
+  'BE',
+  '开放式结局',
+  'ABO',
+  '哨向',
+  '日常甜饼',
+  '虐文',
+  '悬疑',
+  '搞笑',
+  '正剧',
+  '原著向',
+  '架空',
+  '校园',
+  '娱乐圈',
+  '修仙',
+  '重生',
+  '穿越',
+  '系统',
+  '快穿',
+  '破镜重圆',
+  '先婚后爱',
+  '追妻火葬场',
+  '双向暗恋',
+  '病娇',
+  '年下',
+  '西方奇幻',
+  '其他',
+];
 
 const EMPTY_TAGS: TagsData = {
-  preset: { fandom: [], relationship: [], category: '', rating: '', genre: [] },
+  preset: [],
   free: [],
 };
-
-function countPreset(preset: TagsData['preset']): number {
-  return (
-    preset.fandom.length +
-    preset.relationship.length +
-    (preset.category ? 1 : 0) +
-    (preset.rating ? 1 : 0) +
-    preset.genre.length
-  );
-}
-
-function MultiSelect({
-  label,
-  options,
-  selected,
-  onChange,
-  max,
-  required,
-}: {
-  label: string;
-  options: readonly string[];
-  selected: string[];
-  onChange: (v: string[]) => void;
-  max: number;
-  required?: boolean;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  const toggle = (opt: string) => {
-    if (selected.includes(opt)) {
-      onChange(selected.filter((s) => s !== opt));
-    } else {
-      if (selected.length >= max) return;
-      onChange([...selected, opt]);
-    }
-  };
-
-  return (
-    <div className="space-y-1" ref={ref}>
-      <span className="text-[10px] text-academia-muted">
-        {label}
-        {required && <span className="text-academia-gold ml-0.5">*</span>}
-        <span className="text-academia-muted/50 ml-1">
-          {selected.length}/{max}
-        </span>
-      </span>
-      <div className="relative">
-        <button
-          type="button"
-          onClick={() => setOpen(!open)}
-          className="w-full bg-academia-bg border border-academia-border rounded-lg px-3 py-1.5 text-xs text-academia-parchment text-left hover:border-academia-gold/40 transition-colors flex items-center justify-between"
-        >
-          <span className={selected.length === 0 ? 'text-academia-muted/50' : ''}>
-            {selected.length === 0 ? '请选择' : selected.join(' / ')}
-          </span>
-          <span className="text-academia-muted/60 text-[10px]">▼</span>
-        </button>
-        {open && (
-          <div className="absolute z-50 mt-1 w-full bg-academia-surface border border-academia-border rounded-lg shadow-lg max-h-40 overflow-y-auto">
-            {options.map((opt) => (
-              <button
-                key={opt}
-                type="button"
-                onClick={() => toggle(opt)}
-                className={`w-full text-left px-3 py-1.5 text-xs transition-colors ${
-                  selected.includes(opt)
-                    ? 'bg-academia-gold/10 text-academia-gold'
-                    : 'text-academia-parchment hover:bg-academia-bg'
-                }`}
-              >
-                {selected.includes(opt) && '✓ '}
-                {opt}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function PillInput({
-  label,
-  pills,
-  onChange,
-  max,
-  placeholder,
-}: {
-  label: string;
-  pills: string[];
-  onChange: (v: string[]) => void;
-  max: number;
-  placeholder: string;
-}) {
-  const [text, setText] = useState('');
-
-  const addPill = () => {
-    const trimmed = text.trim();
-    if (!trimmed || trimmed.length > 20) return;
-    if (pills.length >= max) return;
-    if (pills.some((p) => p === trimmed)) return;
-    onChange([...pills, trimmed]);
-    setText('');
-  };
-
-  const removePill = (idx: number) => {
-    onChange(pills.filter((_, i) => i !== idx));
-  };
-
-  return (
-    <div className="space-y-1.5">
-      <span className="text-[10px] text-academia-muted">
-        {label}
-        <span className="text-academia-muted/50 ml-1">
-          {pills.length}/{max}
-        </span>
-      </span>
-      <div className="flex flex-wrap items-center gap-1.5 bg-academia-bg border border-academia-border rounded-lg px-2 py-1.5 min-h-[32px]">
-        {pills.map((p, i) => (
-          <span
-            key={i}
-            className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] bg-academia-gold/10 text-academia-gold rounded-full border border-academia-gold/20"
-          >
-            {p}
-            <button
-              type="button"
-              onClick={() => removePill(i)}
-              className="text-academia-gold/60 hover:text-academia-gold ml-0.5"
-            >
-              ×
-            </button>
-          </span>
-        ))}
-        {pills.length < max && (
-          <input
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                addPill();
-              }
-            }}
-            placeholder={pills.length === 0 ? placeholder : ''}
-            maxLength={20}
-            className="flex-1 min-w-[80px] bg-transparent text-xs text-academia-parchment placeholder:text-academia-muted/50 focus:outline-none"
-          />
-        )}
-      </div>
-    </div>
-  );
-}
 
 function PublishDialog({
   open,
@@ -234,13 +91,13 @@ function PublishDialog({
   const [tags, setTags] = useState<TagsData>(EMPTY_TAGS);
   const [freeInput, setFreeInput] = useState('');
 
-  const presetCount = countPreset(tags.preset);
+  const presetCount = tags.preset.length;
   const freeCount = tags.free.length;
 
   const addFreeTag = () => {
     const trimmed = freeInput.trim();
     if (!trimmed || trimmed.length > 20) return;
-    if (freeCount >= 3) return;
+    if (freeCount >= 2) return;
     if (tags.free.some((t) => t === trimmed)) return;
     setTags((prev) => ({ ...prev, free: [...prev.free, trimmed] }));
     setFreeInput('');
@@ -252,7 +109,7 @@ function PublishDialog({
 
   if (!open) return null;
 
-  const canSubmit = tags.preset.fandom.length >= 1;
+  const canSubmit = tags.preset.length >= 1;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -284,82 +141,61 @@ function PublishDialog({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs text-academia-muted font-medium">标签</span>
-              <span className={`text-[10px] ${presetCount > 6 || freeCount > 3 ? 'text-red-400' : 'text-academia-muted/60'}`}>
-                预设 {presetCount}/6，自由 {freeCount}/3
+              <span className={`text-[10px] ${presetCount > 10 || freeCount > 2 ? 'text-red-400' : 'text-academia-muted/60'}`}>
+                预设 {presetCount}/10，自由 {freeCount}/2
               </span>
             </div>
-            <div className="bg-academia-bg border border-academia-border/50 rounded-lg p-4 space-y-4">
-              <MultiSelect
-                label="原著"
-                options={PRESET_OPTIONS.fandom}
-                selected={tags.preset.fandom}
-                onChange={(v) =>
-                  setTags((prev) => ({
-                    ...prev,
-                    preset: { ...prev.preset, fandom: v },
-                  }))
-                }
-                max={2}
-                required
-              />
-
-              <PillInput
-                label="CP / 关系"
-                pills={tags.preset.relationship}
-                onChange={(v) =>
-                  setTags((prev) => ({
-                    ...prev,
-                    preset: { ...prev.preset, relationship: v },
-                  }))
-                }
-                max={2}
-                placeholder="输入CP名，回车添加"
-              />
-
-              <div className="grid grid-cols-2 gap-3">
-                <MultiSelect
-                  label="性向"
-                  options={PRESET_OPTIONS.category}
-                  selected={tags.preset.category ? [tags.preset.category] : []}
-                  onChange={(v) =>
-                    setTags((prev) => ({
-                      ...prev,
-                      preset: { ...prev.preset, category: v[0] || '' },
-                    }))
-                  }
-                  max={1}
-                />
-
-                <MultiSelect
-                  label="分级"
-                  options={PRESET_OPTIONS.rating}
-                  selected={tags.preset.rating ? [tags.preset.rating] : []}
-                  onChange={(v) =>
-                    setTags((prev) => ({
-                      ...prev,
-                      preset: { ...prev.preset, rating: v[0] || '' },
-                    }))
-                  }
-                  max={1}
-                />
+            <div className="bg-academia-bg border border-academia-border/50 rounded-lg p-3 space-y-1.5">
+              <span className="text-[10px] text-academia-muted">
+                固定标签
+                <span className="text-academia-gold ml-0.5">*</span>
+                <span className="text-academia-muted/50 ml-1">
+                  {presetCount}/10
+                </span>
+              </span>
+              <div className="max-h-36 overflow-y-auto flex flex-wrap gap-1.5">
+                {[...PRESET_TAGS]
+                  .sort((a, b) => {
+                    const aSel = tags.preset.includes(a) ? 0 : 1;
+                    const bSel = tags.preset.includes(b) ? 0 : 1;
+                    return aSel - bSel;
+                  })
+                  .map((tag) => {
+                    const selected = tags.preset.includes(tag);
+                    return (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => {
+                          if (selected) {
+                            setTags((prev) => ({
+                              ...prev,
+                              preset: prev.preset.filter((t) => t !== tag),
+                            }));
+                          } else if (presetCount < 10) {
+                            setTags((prev) => ({
+                              ...prev,
+                              preset: [...prev.preset, tag],
+                            }));
+                          }
+                        }}
+                        disabled={!selected && presetCount >= 10}
+                        className={`inline-block px-2 py-0.5 text-[10px] rounded-full border transition-colors ${
+                          selected
+                            ? 'bg-academia-gold/10 text-academia-gold border-academia-gold/20'
+                            : 'bg-academia-surface text-academia-muted border-academia-border hover:border-academia-gold/30 hover:text-academia-parchment disabled:opacity-30 disabled:cursor-not-allowed'
+                        }`}
+                      >
+                        {selected && '✓ '}
+                        {tag}
+                      </button>
+                    );
+                  })}
               </div>
-
-              <MultiSelect
-                label="题材 / 风格"
-                options={PRESET_OPTIONS.genre}
-                selected={tags.preset.genre}
-                onChange={(v) =>
-                  setTags((prev) => ({
-                    ...prev,
-                    preset: { ...prev.preset, genre: v },
-                  }))
-                }
-                max={2}
-              />
             </div>
 
             <div className="bg-academia-bg border border-academia-border/50 rounded-lg p-3 space-y-1.5">
-              <span className="text-[10px] text-academia-muted">自由标签</span>
+              <span className="text-[10px] text-academia-muted">自定义标签</span>
               <div className="flex flex-wrap items-center gap-1.5">
                 {tags.free.map((t, i) => (
                   <span
@@ -376,7 +212,7 @@ function PublishDialog({
                     </button>
                   </span>
                 ))}
-                {freeCount < 3 && (
+                {freeCount < 2 && (
                   <input
                     value={freeInput}
                     onChange={(e) => setFreeInput(e.target.value)}
@@ -386,7 +222,7 @@ function PublishDialog({
                         addFreeTag();
                       }
                     }}
-                    placeholder={freeCount === 0 ? '输入自由标签，回车添加（每标签最长20字）' : ''}
+                    placeholder={freeCount === 0 ? '输入自定义标签，回车添加（每标签最长20字）' : ''}
                     maxLength={20}
                     className="flex-1 min-w-[120px] bg-transparent text-xs text-academia-parchment placeholder:text-academia-muted/50 focus:outline-none"
                   />
@@ -411,7 +247,7 @@ function PublishDialog({
           </label>
 
           {!canSubmit && (
-            <p className="text-[10px] text-red-400">请至少选择一个原著标签</p>
+            <p className="text-[10px] text-red-400">请至少选择一个固定标签</p>
           )}
 
           <div className="flex items-center justify-end gap-3 pt-2">

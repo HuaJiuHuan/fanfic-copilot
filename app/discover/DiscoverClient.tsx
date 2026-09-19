@@ -3,29 +3,12 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import type { TagsData, Project } from '@/lib/types';
-
-function parseTags(raw: string | null): TagsData | null {
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as TagsData;
-  } catch {
-    return null;
-  }
-}
+import { parseTags } from '@/lib/tag-utils';
 
 function TagBadges({ tags }: { tags: TagsData }) {
-  const presetTags: string[] = [
-    ...tags.preset.fandom,
-    ...tags.preset.relationship,
-    ...(tags.preset.category ? [tags.preset.category] : []),
-    ...(tags.preset.rating ? [tags.preset.rating] : []),
-    ...tags.preset.genre,
-  ];
-  const freeTags = tags.free;
-
   return (
     <>
-      {presetTags.map((t, i) => (
+      {tags.preset.map((t, i) => (
         <span
           key={`p-${i}`}
           className="inline-block px-2 py-0.5 text-[10px] bg-academia-gold/10 text-academia-gold rounded-full border border-academia-gold/20"
@@ -33,7 +16,7 @@ function TagBadges({ tags }: { tags: TagsData }) {
           {t}
         </span>
       ))}
-      {freeTags.map((t, i) => (
+      {tags.free.map((t, i) => (
         <span
           key={`f-${i}`}
           className="inline-block px-2 py-0.5 text-[10px] bg-academia-surface text-academia-muted rounded-full border border-academia-border"
@@ -43,12 +26,6 @@ function TagBadges({ tags }: { tags: TagsData }) {
       ))}
     </>
   );
-}
-
-function formatWords(count: number): string {
-  if (count >= 10000) return `${(count / 10000).toFixed(1)}万字`;
-  if (count >= 1000) return `${(count / 1000).toFixed(1)}千字`;
-  return `${count}字`;
 }
 
 function getRelativeTime(date: Date | null): string {
@@ -66,45 +43,26 @@ function getRelativeTime(date: Date | null): string {
 }
 
 interface FilterState {
-  fandom: string[];
-  category: string;
-  rating: string;
-  genre: string[];
-  freeSearch: string;
+  tags: string[];
 }
 
 export interface TagStats {
-  fandom: Record<string, number>;
-  category: Record<string, number>;
-  rating: Record<string, number>;
-  genre: Record<string, number>;
-  free: string[];
+  tags: Record<string, number>;
 }
 
 const EMPTY_FILTERS: FilterState = {
-  fandom: [],
-  category: '',
-  rating: '',
-  genre: [],
-  freeSearch: '',
+  tags: [],
 };
 
 function hasAnyFilter(f: FilterState): boolean {
-  return f.fandom.length > 0 || !!f.category || !!f.rating || f.genre.length > 0 || !!f.freeSearch;
+  return f.tags.length > 0;
 }
 
 function matchesFilters(proj: Project, filters: FilterState): boolean {
   const tags = parseTags(proj.tags);
   if (!tags) return !hasAnyFilter(filters);
 
-  if (filters.fandom.length > 0 && !tags.preset.fandom.some((f) => filters.fandom.includes(f))) return false;
-  if (filters.category && tags.preset.category !== filters.category) return false;
-  if (filters.rating && tags.preset.rating !== filters.rating) return false;
-  if (filters.genre.length > 0 && !tags.preset.genre.some((g) => filters.genre.includes(g))) return false;
-  if (filters.freeSearch) {
-    const s = filters.freeSearch.toLowerCase();
-    if (!tags.free.some((t) => t.toLowerCase().includes(s))) return false;
-  }
+  if (filters.tags.length > 0 && !tags.preset.some((t) => filters.tags.includes(t))) return false;
   return true;
 }
 
@@ -175,111 +133,25 @@ export default function DiscoverClient({ projects, authorMap, userId, tagStats, 
 
   const clearFilters = () => setFilters(EMPTY_FILTERS);
 
-  const fandomOptions = useMemo(
-    () => Object.entries(tagStats.fandom).sort(([, a], [, b]) => b - a),
-    [tagStats.fandom],
-  );
-  const categoryOptions = useMemo(
-    () => Object.entries(tagStats.category).sort(([, a], [, b]) => b - a),
-    [tagStats.category],
-  );
-  const ratingOptions = useMemo(
-    () => Object.entries(tagStats.rating).sort(([, a], [, b]) => b - a),
-    [tagStats.rating],
-  );
-  const genreOptions = useMemo(
-    () => Object.entries(tagStats.genre).sort(([, a], [, b]) => b - a),
-    [tagStats.genre],
+  const tagOptions = useMemo(
+    () => Object.entries(tagStats.tags).sort(([, a], [, b]) => b - a),
+    [tagStats.tags],
   );
 
   return (
     <div className="flex gap-6">
       <aside className="w-48 shrink-0 space-y-4">
         <div className="bg-academia-surface border border-academia-border rounded-xl p-3 space-y-4 sticky top-6">
-          <div className="space-y-1.5">
-            <h4 className="text-[10px] font-bold text-academia-muted uppercase tracking-wider">🔍 搜索</h4>
-            <input
-              type="text"
-              value={filters.freeSearch}
-              onChange={(e) => setFilters((prev) => ({ ...prev, freeSearch: e.target.value }))}
-              placeholder="自由标签关键词..."
-              className="w-full bg-academia-bg border border-academia-border rounded-lg px-2 py-1 text-[11px] text-academia-parchment placeholder:text-academia-muted/50 focus:outline-none focus:border-academia-gold/40"
-            />
-            {tagStats.free.length > 0 && filters.freeSearch && (
-              <div className="flex flex-wrap gap-1">
-                {tagStats.free
-                  .filter((t) => t.toLowerCase().includes(filters.freeSearch.toLowerCase()))
-                  .slice(0, 8)
-                  .map((t) => (
-                    <span
-                      key={t}
-                      className="text-[10px] text-academia-muted/50 bg-academia-bg rounded px-1.5 py-0.5"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                {tagStats.free.filter((t) => t.toLowerCase().includes(filters.freeSearch.toLowerCase())).length > 8 && (
-                  <span className="text-[10px] text-academia-muted/40">...</span>
-                )}
-              </div>
-            )}
-          </div>
-
           <FilterSection
-            title="原著"
-            icon="📚"
-            options={fandomOptions}
-            selected={filters.fandom}
+            title="筛选标签"
+            icon="🏷️"
+            options={tagOptions}
+            selected={filters.tags}
             onToggle={(val) =>
               setFilters((prev) => ({
-                ...prev,
-                fandom: prev.fandom.includes(val)
-                  ? prev.fandom.filter((f) => f !== val)
-                  : [...prev.fandom, val],
-              }))
-            }
-            multi
-          />
-
-          <FilterSection
-            title="性向"
-            icon="💕"
-            options={categoryOptions}
-            selected={filters.category ? [filters.category] : []}
-            onToggle={(val) =>
-              setFilters((prev) => ({
-                ...prev,
-                category: prev.category === val ? '' : val,
-              }))
-            }
-            multi={false}
-          />
-
-          <FilterSection
-            title="分级"
-            icon="🔞"
-            options={ratingOptions}
-            selected={filters.rating ? [filters.rating] : []}
-            onToggle={(val) =>
-              setFilters((prev) => ({
-                ...prev,
-                rating: prev.rating === val ? '' : val,
-              }))
-            }
-            multi={false}
-          />
-
-          <FilterSection
-            title="题材"
-            icon="🎨"
-            options={genreOptions}
-            selected={filters.genre}
-            onToggle={(val) =>
-              setFilters((prev) => ({
-                ...prev,
-                genre: prev.genre.includes(val)
-                  ? prev.genre.filter((g) => g !== val)
-                  : [...prev.genre, val],
+                tags: prev.tags.includes(val)
+                  ? prev.tags.filter((t) => t !== val)
+                  : [...prev.tags, val],
               }))
             }
             multi

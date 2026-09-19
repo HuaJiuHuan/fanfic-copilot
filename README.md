@@ -1,4 +1,4 @@
-# Fanfic Copilot
+# Quillow — AI 同人创作与阅读平台
 
 AI 同人小说智能写作平台。基于 DeepSeek 大语言模型，三级 Agent 串行协作，从大纲推演到场景执笔，AI 全程辅助你的创作之旅。
 
@@ -24,7 +24,7 @@ Next.js 16 + React 19 + TypeScript + Tailwind CSS v4 + Turso/SQLite + Drizzle OR
 ## 项目结构
 
 ```
-fanfic-copilot/
+quillow/
 ├── app/
 │   ├── actions/          # Server Actions
 │   ├── api/              # SSE 流式端点

@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!project) return { title: '作品未找到' };
 
   return {
-    title: `${project.title} - Fanfic Copilot`,
+    title: `${project.title} - Quillow`,
     description: project.summary || `《${project.title}》— 原著：${project.fandom}`,
   };
 }

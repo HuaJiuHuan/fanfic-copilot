@@ -5,57 +5,29 @@ import { db } from '@/lib/db';
 import { projects, users, kudos, bookmarks, comments } from '@/lib/db-schema';
 import { inArray, desc, eq, sql } from 'drizzle-orm';
 import AppHeader from '@/components/AppHeader';
-import type { TagsData, Project } from '@/lib/types';
+import type { Project } from '@/lib/types';
 import DiscoverClient from './DiscoverClient';
 import type { TagStats } from './DiscoverClient';
+import { parseTags } from '@/lib/tag-utils';
 
 export const metadata: Metadata = {
   title: '作品广场',
   description: '浏览所有已发布的同人小说作品',
 };
 
-function parseTags(raw: string | null): TagsData | null {
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as TagsData;
-  } catch {
-    return null;
-  }
-}
-
 function computeTagStats(list: Project[]): TagStats {
-  const stats: TagStats = {
-    fandom: {},
-    category: {},
-    rating: {},
-    genre: {},
-    free: [],
-  };
-  const freeSet = new Set<string>();
+  const tagCounts: Record<string, number> = {};
 
   for (const proj of list) {
     const tags = parseTags(proj.tags);
     if (!tags) continue;
 
-    for (const f of tags.preset.fandom) {
-      stats.fandom[f] = (stats.fandom[f] || 0) + 1;
-    }
-    if (tags.preset.category) {
-      stats.category[tags.preset.category] = (stats.category[tags.preset.category] || 0) + 1;
-    }
-    if (tags.preset.rating) {
-      stats.rating[tags.preset.rating] = (stats.rating[tags.preset.rating] || 0) + 1;
-    }
-    for (const g of tags.preset.genre) {
-      stats.genre[g] = (stats.genre[g] || 0) + 1;
-    }
-    for (const f of tags.free) {
-      freeSet.add(f);
+    for (const t of tags.preset) {
+      tagCounts[t] = (tagCounts[t] || 0) + 1;
     }
   }
 
-  stats.free = [...freeSet].sort();
-  return stats;
+  return { tags: tagCounts };
 }
 
 export default async function DiscoverPage() {

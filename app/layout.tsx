@@ -16,19 +16,19 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Fanfic Copilot — AI 同人写作助手',
-    template: '%s | Fanfic Copilot',
+    default: 'Quillow — AI 同人创作与阅读平台',
+    template: '%s | Quillow',
   },
   description:
     '基于大语言模型的同人小说智能写作平台。从大纲推演到场景执笔，AI 全程辅助你的创作之旅。',
   keywords: ['同人小说', 'AI写作', '小说大纲', 'DeepSeek', '创作工具'],
-  authors: [{ name: 'Fanfic Copilot' }],
+  authors: [{ name: 'Quillow' }],
   openGraph: {
-    title: 'Fanfic Copilot — AI 同人写作助手',
+    title: 'Quillow — AI 同人创作与阅读平台',
     description: '从大纲推演到场景执笔，AI 全程辅助你的同人创作。',
     type: 'website',
     locale: 'zh_CN',
-    siteName: 'Fanfic Copilot',
+    siteName: 'Quillow',
   },
   robots: {
     index: true,

@@ -11,12 +11,12 @@ const mastraStorageAuthToken = process.env.TURSO_AUTH_TOKEN;
 
 const storage = process.env.TURSO_DATABASE_URL
   ? new LibSQLStore({
-      id: 'fanfic-mastra-storage',
+      id: 'quillow-mastra-storage',
       url: mastraStorageUrl,
       authToken: mastraStorageAuthToken,
     })
   : new LibSQLStore({
-      id: 'fanfic-mastra-storage',
+      id: 'quillow-mastra-storage',
       url: mastraStorageUrl,
     });
 

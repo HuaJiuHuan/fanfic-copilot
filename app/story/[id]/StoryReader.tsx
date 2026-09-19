@@ -7,15 +7,7 @@ import InteractionBar from '@/components/InteractionBar';
 import SubscribeButton from '@/components/SubscribeButton';
 import ReadingProgress from '@/components/ReadingProgress';
 import CommentSection from '@/components/CommentSection';
-
-function parseTags(raw: string | null): TagsData | null {
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as TagsData;
-  } catch {
-    return null;
-  }
-}
+import { parseTags } from '@/lib/tag-utils';
 
 interface Props {
   project: Project;
@@ -104,13 +96,7 @@ export default memo(function StoryReader({ project, outline, drafts, authorName,
         <div className="flex flex-wrap items-center justify-center gap-1.5 mt-3">
           {tagsData ? (
             <>
-              {[
-                ...tagsData.preset.fandom,
-                ...tagsData.preset.relationship,
-                ...(tagsData.preset.category ? [tagsData.preset.category] : []),
-                ...(tagsData.preset.rating ? [tagsData.preset.rating] : []),
-                ...tagsData.preset.genre,
-              ].map((t, i) => (
+              {tagsData.preset.map((t, i) => (
                 <span
                   key={`p-${i}`}
                   className="inline-block px-2 py-0.5 text-[10px] bg-academia-gold/10 text-academia-gold rounded-full border border-academia-gold/20"

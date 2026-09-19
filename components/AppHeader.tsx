@@ -46,7 +46,7 @@ export default function AppHeader({ breadcrumbs, username, children }: AppHeader
             href="/"
             className="text-xl font-serif font-bold tracking-widest text-academia-gold hover:opacity-80 transition-opacity shrink-0"
           >
-            FANFIC COPILOT
+            QUILLOW
           </Link>
           {breadcrumbs.length > 0 && (
             <>
