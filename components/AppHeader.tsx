@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
+import NotificationBell from '@/components/NotificationBell';
 
 interface BreadcrumbItem {
   label: string;
@@ -21,9 +22,32 @@ export default function AppHeader({ breadcrumbs, username, children }: AppHeader
   const [logoutLoading, setLogoutLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  function handleLogout() {
+  async function handleLogout() {
     setLogoutLoading(true);
-    window.location.assign('/api/auth/signout?callbackUrl=/login');
+    try {
+      const csrfRes = await fetch('/api/auth/csrf');
+      const csrfData = await csrfRes.json();
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/api/auth/signout';
+      form.style.display = 'none';
+
+      const csrfInput = document.createElement('input');
+      csrfInput.name = 'csrfToken';
+      csrfInput.value = csrfData.csrfToken;
+      form.appendChild(csrfInput);
+
+      const callbackInput = document.createElement('input');
+      callbackInput.name = 'callbackUrl';
+      callbackInput.value = '/login';
+      form.appendChild(callbackInput);
+
+      document.body.appendChild(form);
+      form.submit();
+    } catch {
+      window.location.assign('/api/auth/signout?callbackUrl=/login');
+    }
   }
 
   useEffect(() => {
@@ -91,15 +115,7 @@ export default function AppHeader({ breadcrumbs, username, children }: AppHeader
             + 开新坑
           </Link>
 
-          <button
-            className="w-8 h-8 rounded-full bg-academia-surface border border-academia-border flex items-center justify-center text-xs text-academia-muted hover:text-academia-gold hover:border-academia-gold/40 transition-colors shrink-0"
-            aria-label="通知"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-            </svg>
-          </button>
+          <NotificationBell />
 
           <div ref={dropdownRef} className="relative shrink-0">
             <button

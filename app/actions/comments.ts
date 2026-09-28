@@ -2,11 +2,12 @@
 
 import { cache } from 'react';
 import { db } from '@/lib/db';
-import { comments, users } from '@/lib/db-schema';
+import { comments, users, projects } from '@/lib/db-schema';
 import { asc, eq, sql } from 'drizzle-orm';
 import { getUserIdOrThrow } from '@/lib/server/auth-guard';
 import { revalidatePath } from 'next/cache';
 import type { Comment, CommentWithUser } from '@/lib/types';
+import { createNotification } from '@/app/actions/notifications';
 
 interface CommentRow {
   id: string;
@@ -114,7 +115,7 @@ export async function addComment(
 
     if (parentId) {
       const [parent] = await db
-        .select({ id: comments.id, isDeleted: comments.isDeleted })
+        .select({ id: comments.id, userId: comments.userId, isDeleted: comments.isDeleted })
         .from(comments)
         .where(eq(comments.id, parentId))
         .limit(1);
@@ -124,13 +125,48 @@ export async function addComment(
       }
     }
 
+    const commentId = crypto.randomUUID();
+
     await db.insert(comments).values({
-      id: crypto.randomUUID(),
+      id: commentId,
       userId,
       projectId,
       parentId: parentId || null,
       content: content.trim(),
     });
+
+    // 通知：顶级评论 → 作品作者；回复 → 被回复者
+    if (parentId) {
+      const [parent] = await db
+        .select({ userId: comments.userId })
+        .from(comments)
+        .where(eq(comments.id, parentId))
+        .limit(1);
+      if (parent) {
+        await createNotification({
+          userId: parent.userId,
+          actorId: userId,
+          type: 'comment_reply',
+          projectId,
+          commentId,
+        });
+      }
+    } else {
+      const [project] = await db
+        .select({ userId: projects.userId })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .limit(1);
+      if (project) {
+        await createNotification({
+          userId: project.userId,
+          actorId: userId,
+          type: 'comment_project',
+          projectId,
+          commentId,
+        });
+      }
+    }
 
     revalidatePath(`/story/${projectId}`);
 

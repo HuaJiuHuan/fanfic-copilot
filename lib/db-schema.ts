@@ -246,31 +246,19 @@ export const readingHistory = sqliteTable(
   },
 );
 
-// ─── Mastra 内部表 (由 @mastra/libsql 自动管理，此处仅声明以避免 drizzle-kit push 误删) ───
-
-export const mastraThreads = sqliteTable('mastra_threads', {
-  id: text('id').primaryKey(),
-  resourceId: text('resourceId').notNull(),
-  title: text('title').notNull(),
-  metadata: text('metadata', { mode: 'json' }),
-  createdAt: text('createdAt').notNull(),
-  updatedAt: text('updatedAt').notNull(),
-});
-
-export const mastraMessages = sqliteTable('mastra_messages', {
-  id: text('id').primaryKey(),
-  thread_id: text('thread_id').notNull(),
-  content: text('content').notNull(),
-  role: text('role').notNull(),
+export const notifications = sqliteTable('notifications', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  actorId: text('actor_id')
+    .references(() => users.id, { onDelete: 'set null' }),
   type: text('type').notNull(),
-  createdAt: text('createdAt').notNull(),
-  resourceId: text('resourceId'),
-});
-
-export const mastraResources = sqliteTable('mastra_resources', {
-  id: text('id').primaryKey(),
-  workingMemory: text('workingMemory'),
-  metadata: text('metadata', { mode: 'json' }),
-  createdAt: text('createdAt').notNull(),
-  updatedAt: text('updatedAt').notNull(),
+  projectId: text('project_id')
+    .references(() => projects.id, { onDelete: 'cascade' }),
+  commentId: text('comment_id'),
+  isRead: integer('is_read', { mode: 'boolean' }).default(false),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });

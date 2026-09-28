@@ -8,6 +8,7 @@ import type {
   bookmarks,
   subscriptions,
   readingHistory,
+  notifications,
 } from '@/lib/db-schema';
 
 export type { StoryOutline };
@@ -37,6 +38,12 @@ export type Subscription = typeof subscriptions.$inferSelect;
 
 export type ReadingHistory = typeof readingHistory.$inferSelect;
 
+export type Notification = typeof notifications.$inferSelect;
+
+export interface NotificationWithActor extends Notification {
+  actorName: string | null;
+}
+
 export type Scene = StoryOutline['acts'][number]['scenes'][number];
 
 export type Act = StoryOutline['acts'][number];
@@ -52,4 +59,6 @@ export interface InteractionState {
   bookmarkCount: number;
   isBookmarked: boolean;
   commentCount: number;
+  subscriptionCount: number;
+  isSubscribed: boolean;
 }

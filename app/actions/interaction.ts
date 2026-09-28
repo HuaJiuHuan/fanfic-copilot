@@ -7,6 +7,7 @@ import { and, desc, eq, sql } from 'drizzle-orm';
 import { getUserIdOrThrow } from '@/lib/server/auth-guard';
 import { revalidatePath } from 'next/cache';
 import type { InteractionState, Kudos, Bookmark, Subscription, ReadingHistory } from '@/lib/types';
+import { createNotification } from '@/app/actions/notifications';
 
 export async function toggleKudos(projectId: string): Promise<{
   success: boolean;
@@ -31,6 +32,20 @@ export async function toggleKudos(projectId: string): Promise<{
         userId,
         projectId,
       });
+
+      const [project] = await db
+        .select({ userId: projects.userId })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .limit(1);
+      if (project) {
+        await createNotification({
+          userId: project.userId,
+          actorId: userId,
+          type: 'kudos',
+          projectId,
+        });
+      }
     }
 
     const [result] = await db
@@ -81,6 +96,20 @@ export async function toggleBookmark(
         isPrivate,
         note,
       });
+
+      const [project] = await db
+        .select({ userId: projects.userId })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .limit(1);
+      if (project) {
+        await createNotification({
+          userId: project.userId,
+          actorId: userId,
+          type: 'bookmark',
+          projectId,
+        });
+      }
     }
 
     const [result] = await db
@@ -107,6 +136,7 @@ export async function toggleSubscription(
 ): Promise<{
   success: boolean;
   isSubscribed: boolean;
+  subscriptionCount: number;
   error?: string;
 }> {
   try {
@@ -135,13 +165,19 @@ export async function toggleSubscription(
       });
     }
 
+    const [subResult] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(subscriptions)
+      .where(and(eq(subscriptions.targetType, targetType), eq(subscriptions.targetId, targetId)));
+
     return {
       success: true,
       isSubscribed: !existing,
+      subscriptionCount: subResult?.count ?? 0,
     };
   } catch (error) {
     console.error('Subscription 操作失败:', error);
-    return { success: false, isSubscribed: false, error: '操作失败，请重试。' };
+    return { success: false, isSubscribed: false, subscriptionCount: 0, error: '操作失败，请重试。' };
   }
 }
 
@@ -187,15 +223,18 @@ export const getInteractionState = cache(
       bookmarkCount: 0,
       isBookmarked: false,
       commentCount: 0,
+      subscriptionCount: 0,
+      isSubscribed: false,
     };
 
     try {
       const userId = await getUserIdOrThrow();
 
-      const [kudosResult, bookmarkResult, commentResult, userKudos, userBookmark] = await Promise.all([
+      const [kudosResult, bookmarkResult, commentResult, subResult, userKudos, userBookmark, userSub] = await Promise.all([
         db.select({ count: sql<number>`count(*)` }).from(kudos).where(eq(kudos.projectId, projectId)),
         db.select({ count: sql<number>`count(*)` }).from(bookmarks).where(eq(bookmarks.projectId, projectId)),
         db.select({ count: sql<number>`count(*)` }).from(comments).where(eq(comments.projectId, projectId)),
+        db.select({ count: sql<number>`count(*)` }).from(subscriptions).where(eq(subscriptions.targetId, projectId)),
         db
           .select()
           .from(kudos)
@@ -206,6 +245,11 @@ export const getInteractionState = cache(
           .from(bookmarks)
           .where(and(eq(bookmarks.userId, userId), eq(bookmarks.projectId, projectId)))
           .limit(1),
+        db
+          .select()
+          .from(subscriptions)
+          .where(and(eq(subscriptions.userId, userId), eq(subscriptions.targetId, projectId)))
+          .limit(1),
       ]);
 
       return {
@@ -214,6 +258,8 @@ export const getInteractionState = cache(
         bookmarkCount: bookmarkResult[0]?.count ?? 0,
         isBookmarked: userBookmark.length > 0,
         commentCount: commentResult[0]?.count ?? 0,
+        subscriptionCount: subResult[0]?.count ?? 0,
+        isSubscribed: userSub.length > 0,
       };
     } catch {
       return empty;

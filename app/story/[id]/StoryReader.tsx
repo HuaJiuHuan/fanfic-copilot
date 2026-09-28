@@ -126,6 +126,7 @@ export default memo(function StoryReader({ project, outline, drafts, authorName,
             authorName={authorName}
             projectId={project.id}
             projectTitle={project.title}
+            initialSubCount={interactionState.subscriptionCount}
           />
         </div>
       </header>

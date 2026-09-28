@@ -2,16 +2,17 @@
 
 import { cache } from 'react';
 import { db } from '@/lib/db';
-import { projects } from '@/lib/db-schema';
+import { projects, subscriptions } from '@/lib/db-schema';
 import { and, desc, eq } from 'drizzle-orm';
 import { getUserIdOrThrow } from '@/lib/server/auth-guard';
 import type { TagsData } from '@/lib/types';
+import { createNotification } from '@/app/actions/notifications';
 
 export async function publishProject(projectId: string, summary: string, tags: TagsData) {
   const userId = await getUserIdOrThrow();
 
   const [project] = await db
-    .select({ userId: projects.userId })
+    .select({ userId: projects.userId, isPublished: projects.isPublished, title: projects.title })
     .from(projects)
     .where(and(eq(projects.id, projectId), eq(projects.userId, userId)))
     .limit(1);
@@ -19,6 +20,8 @@ export async function publishProject(projectId: string, summary: string, tags: T
   if (!project) {
     throw new Error('项目不存在或无权操作');
   }
+
+  const wasPublished = project.isPublished;
 
   await db
     .update(projects)
@@ -30,6 +33,34 @@ export async function publishProject(projectId: string, summary: string, tags: T
       updatedAt: new Date(),
     })
     .where(eq(projects.id, projectId));
+
+  if (!wasPublished) {
+    const subs = await db
+      .select()
+      .from(subscriptions)
+      .where(and(eq(subscriptions.targetType, 'author'), eq(subscriptions.targetId, userId)));
+    for (const sub of subs) {
+      await createNotification({
+        userId: sub.userId,
+        actorId: userId,
+        type: 'subscription_author',
+        projectId,
+      });
+    }
+  } else {
+    const subs = await db
+      .select()
+      .from(subscriptions)
+      .where(and(eq(subscriptions.targetType, 'project'), eq(subscriptions.targetId, projectId)));
+    for (const sub of subs) {
+      await createNotification({
+        userId: sub.userId,
+        actorId: userId,
+        type: 'subscription_project',
+        projectId,
+      });
+    }
+  }
 
   return { success: true };
 }
