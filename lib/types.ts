@@ -5,7 +5,6 @@ import type {
   sceneDrafts,
   kudos,
   comments,
-  bookmarks,
   subscriptions,
   readingHistory,
   notifications,
@@ -32,8 +31,6 @@ export type CommentWithUser = Comment & {
   replies: CommentWithUser[];
 };
 
-export type Bookmark = typeof bookmarks.$inferSelect;
-
 export type Subscription = typeof subscriptions.$inferSelect;
 
 export type ReadingHistory = typeof readingHistory.$inferSelect;
@@ -56,8 +53,6 @@ export interface TagsData {
 export interface InteractionState {
   kudosCount: number;
   isKudosed: boolean;
-  bookmarkCount: number;
-  isBookmarked: boolean;
   commentCount: number;
   subscriptionCount: number;
   isSubscribed: boolean;

@@ -2,7 +2,7 @@ import { getProjectById } from '@/app/actions/project';
 import { db } from '@/lib/db';
 import { outlines } from '@/lib/db-schema';
 import { desc, eq } from 'drizzle-orm';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getAuthSession } from '@/lib/auth';
 import AppHeader from '@/components/AppHeader';
@@ -29,11 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProjectWorkspacePage({ params }: { params: { id: string } }) {
   const session = await getAuthSession();
-  if (!session) {
-    redirect('/login');
-  }
-
-  const user = session.user as any;
+  const user = session!.user as any;
   const userId = user?.id;
   const { id } = await params;
 

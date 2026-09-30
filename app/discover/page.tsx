@@ -1,8 +1,7 @@
-import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getAuthSession } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { projects, users, kudos, bookmarks, comments, subscriptions } from '@/lib/db-schema';
+import { projects, users, kudos, comments, subscriptions } from '@/lib/db-schema';
 import { inArray, and, desc, eq, sql } from 'drizzle-orm';
 import AppHeader from '@/components/AppHeader';
 import type { Project } from '@/lib/types';
@@ -32,11 +31,7 @@ function computeTagStats(list: Project[]): TagStats {
 
 export default async function DiscoverPage() {
   const session = await getAuthSession();
-  if (!session) {
-    redirect('/login');
-  }
-
-  const user = session.user as any;
+  const user = session!.user as any;
   const userId = user?.id as string;
 
   const publishedList = (await db
@@ -61,20 +56,15 @@ export default async function DiscoverPage() {
   const tagStats = computeTagStats(publishedList);
 
   const projectIds = publishedList.map((p) => p.id);
-  const interactionMap: Record<string, { kudos: number; bookmarks: number; comments: number; subscriptions: number }> = {};
+  const interactionMap: Record<string, { kudos: number; comments: number; subscriptions: number }> = {};
 
   if (projectIds.length > 0) {
-    const [kudosRows, bookmarkRows, commentRows, subRows] = await Promise.all([
+    const [kudosRows, commentRows, subRows] = await Promise.all([
       db
         .select({ projectId: kudos.projectId, count: sql<number>`count(*)` })
         .from(kudos)
         .where(inArray(kudos.projectId, projectIds))
         .groupBy(kudos.projectId),
-      db
-        .select({ projectId: bookmarks.projectId, count: sql<number>`count(*)` })
-        .from(bookmarks)
-        .where(inArray(bookmarks.projectId, projectIds))
-        .groupBy(bookmarks.projectId),
       db
         .select({ projectId: comments.projectId, count: sql<number>`count(*)` })
         .from(comments)
@@ -88,10 +78,9 @@ export default async function DiscoverPage() {
     ]);
 
     for (const pid of projectIds) {
-      interactionMap[pid] = { kudos: 0, bookmarks: 0, comments: 0, subscriptions: 0 };
+      interactionMap[pid] = { kudos: 0, comments: 0, subscriptions: 0 };
     }
     for (const row of kudosRows) interactionMap[row.projectId].kudos = row.count;
-    for (const row of bookmarkRows) interactionMap[row.projectId].bookmarks = row.count;
     for (const row of commentRows) interactionMap[row.projectId].comments = row.count;
     for (const row of subRows) interactionMap[row.projectId].subscriptions = row.count;
   }

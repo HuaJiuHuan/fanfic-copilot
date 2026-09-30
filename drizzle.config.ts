@@ -22,7 +22,6 @@ export default defineConfig({
     'scene_drafts',
     'kudos',
     'comments',
-    'bookmarks',
     'subscriptions',
     'reading_history',
     'notifications',

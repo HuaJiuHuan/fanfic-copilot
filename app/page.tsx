@@ -2,7 +2,6 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getProjectsWithStats } from '@/app/actions/project';
 import { getAuthSession } from '@/lib/auth';
-import { redirect } from 'next/navigation';
 import AppHeader from '@/components/AppHeader';
 import DeleteProjectButton from '@/components/DeleteProjectButton';
 
@@ -37,11 +36,7 @@ function getRelativeTime(date: Date | null): string {
 
 export default async function DashboardPage() {
   const session = await getAuthSession();
-  if (!session) {
-    redirect('/login');
-  }
-
-  const user = session.user as any;
+  const user = session!.user as any;
   const projectList = await getProjectsWithStats();
 
   return (
@@ -132,7 +127,6 @@ export default async function DashboardPage() {
                     {proj.isPublished && (
                       <>
                         <span title="点赞">❤️ {proj.kudosCount}</span>
-                        <span title="收藏">🔖 {proj.bookmarkCount}</span>
                         <span title="评论">💬 {proj.commentCount}</span>
                       </>
                     )}

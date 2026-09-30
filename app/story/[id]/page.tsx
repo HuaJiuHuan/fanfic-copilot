@@ -2,7 +2,7 @@ import { getAuthSession } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { projects, users, outlines, sceneDrafts } from '@/lib/db-schema';
 import { desc, eq } from 'drizzle-orm';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import type { OutlineRecord, SceneDraft, Project } from '@/lib/types';
 import { getInteractionState } from '@/app/actions/interaction';
@@ -31,11 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function StoryPage({ params }: Props) {
   const session = await getAuthSession();
-  if (!session) {
-    redirect('/login');
-  }
-
-  const userId = (session.user as any)?.id;
+  const userId = (session!.user as any).id;
   const { id } = await params;
 
   const [row] = await db.select().from(projects).where(eq(projects.id, id)).limit(1);
@@ -72,7 +68,7 @@ export default async function StoryPage({ params }: Props) {
 
   const interactionState = await getInteractionState(id);
 
-  const currentUserName = session.user?.name || session.user?.email?.split('@')[0] || '用户';
+  const currentUserName = session?.user?.name || session?.user?.email?.split('@')[0] || '用户';
 
   return (
     <div className="min-h-screen bg-academia-bg text-academia-parchment font-sans selection:bg-academia-gold/20">

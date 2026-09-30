@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { projects, outlines, sceneDrafts, kudos, bookmarks, comments } from '@/lib/db-schema';
+import { projects, outlines, sceneDrafts, kudos, comments } from '@/lib/db-schema';
 import { desc, inArray, eq, sql } from 'drizzle-orm';
 
 export interface ProjectWithStats {
@@ -15,7 +15,6 @@ export interface ProjectWithStats {
   sceneCount: number;
   hasContent: boolean;
   kudosCount: number;
-  bookmarkCount: number;
   commentCount: number;
 }
 
@@ -30,22 +29,17 @@ export async function getProjectsWithStats(userId: string): Promise<ProjectWithS
 
   const allProjectIds = projectList.map((p) => p.id);
 
-  const fallbackStats = { kudosCount: 0, bookmarkCount: 0, commentCount: 0 };
+  const fallbackStats = { kudosCount: 0, commentCount: 0 };
   const statsMap = new Map<string, typeof fallbackStats>();
   for (const pid of allProjectIds) {
-    statsMap.set(pid, { kudosCount: 0, bookmarkCount: 0, commentCount: 0 });
+    statsMap.set(pid, { kudosCount: 0, commentCount: 0 });
   }
-  const [kudosRows, bookmarkRows, commentRows] = await Promise.all([
+  const [kudosRows, commentRows] = await Promise.all([
     db
       .select({ projectId: kudos.projectId, count: sql<number>`count(*)` })
       .from(kudos)
       .where(inArray(kudos.projectId, allProjectIds))
       .groupBy(kudos.projectId),
-    db
-      .select({ projectId: bookmarks.projectId, count: sql<number>`count(*)` })
-      .from(bookmarks)
-      .where(inArray(bookmarks.projectId, allProjectIds))
-      .groupBy(bookmarks.projectId),
     db
       .select({ projectId: comments.projectId, count: sql<number>`count(*)` })
       .from(comments)
@@ -55,10 +49,6 @@ export async function getProjectsWithStats(userId: string): Promise<ProjectWithS
   for (const row of kudosRows) {
     const s = statsMap.get(row.projectId);
     if (s) s.kudosCount = row.count;
-  }
-  for (const row of bookmarkRows) {
-    const s = statsMap.get(row.projectId);
-    if (s) s.bookmarkCount = row.count;
   }
   for (const row of commentRows) {
     const s = statsMap.get(row.projectId);

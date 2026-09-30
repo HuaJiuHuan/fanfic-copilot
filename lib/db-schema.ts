@@ -175,29 +175,6 @@ export const comments = sqliteTable('comments', {
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 
-export const bookmarks = sqliteTable(
-  'bookmarks',
-  {
-    id: text('id')
-      .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
-    userId: text('user_id')
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
-    projectId: text('project_id')
-      .notNull()
-      .references(() => projects.id, { onDelete: 'cascade' }),
-    isPrivate: integer('is_private', { mode: 'boolean' }).default(false),
-    note: text('note').default(''),
-    createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
-  },
-  (table) => {
-    return {
-      userProjectUnique: uniqueIndex('bookmarks_user_project_unique').on(table.userId, table.projectId),
-    };
-  },
-);
-
 export const subscriptions = sqliteTable(
   'subscriptions',
   {
