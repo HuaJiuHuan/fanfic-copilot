@@ -7,8 +7,8 @@ import type { Metadata } from 'next';
 import { getAuthSession } from '@/lib/auth';
 import AppHeader from '@/components/AppHeader';
 import WorkspaceClient from './WorkspaceClient';
-import GenerateButton from '@/components/GenerateButton';
 import PublishButton from '@/components/PublishButton';
+import FloatingArchive from '@/components/FloatingArchive';
 import type { OutlineRecord } from '@/lib/types';
 
 interface Props {
@@ -63,30 +63,14 @@ export default async function ProjectWorkspacePage({ params }: { params: { id: s
         />
       </AppHeader>
 
-      <main className="flex-1 w-full max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <aside className="lg:col-span-3 space-y-6">
-          <div className="bg-academia-surface border border-academia-border p-5 rounded-xl space-y-4">
-            <h3 className="text-xs font-bold text-academia-gold uppercase tracking-widest border-b border-academia-border/50 pb-2">
-              全局档案
-            </h3>
-            <div className="space-y-1">
-              <span className="text-[10px] text-academia-muted uppercase">原著</span>
-              <p className="text-sm">{project.fandom}</p>
-            </div>
-            <div className="space-y-1">
-              <span className="text-[10px] text-academia-muted uppercase">角色</span>
-              <p className="text-sm">{project.characters}</p>
-            </div>
-            <div className="space-y-1">
-              <span className="text-[10px] text-academia-muted uppercase">核心脑洞</span>
-              <p className="text-sm text-academia-muted leading-relaxed">{project.premise}</p>
-            </div>
-          </div>
+      <FloatingArchive
+        fandom={project.fandom}
+        characters={project.characters}
+        premise={project.premise}
+      />
 
-          <GenerateButton />
-        </aside>
-
-        <section className="lg:col-span-9 bg-academia-surface/30 border border-academia-border rounded-xl p-6 min-h-[700px] flex flex-col">
+      <main className="flex-1 w-full max-w-7xl mx-auto p-6 flex flex-col">
+        <section className="flex-1 bg-academia-surface/30 border border-academia-border rounded-xl p-6 min-h-[700px] flex flex-col">
           <WorkspaceClient
             project={project}
             initialHistory={historyOutlines}

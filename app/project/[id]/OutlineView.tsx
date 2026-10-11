@@ -58,6 +58,13 @@ export default memo(function OutlineView({ project }: OutlineViewProps) {
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={generateOutline}
+            disabled={isLoading}
+            className="text-xs bg-academia-gold/10 border border-academia-gold/30 text-academia-gold px-3 py-1.5 rounded hover:bg-academia-gold/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? '高维运算中...' : history.length > 0 ? '分支重摇' : '首次推演大纲'}
+          </button>
           {history.length > 0 && !isEditing && (
             <>
               <button
@@ -128,7 +135,7 @@ export default memo(function OutlineView({ project }: OutlineViewProps) {
         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar min-w-0">
           {!displayData && !isLoading && (
             <div className="w-full h-64 flex items-center justify-center text-academia-muted text-sm font-serif">
-              点击右侧面板的「分支重摇」按钮，基于全局档案生成故事架构...
+              点击上方工具栏的「分支重摇」按钮，基于全局档案生成故事架构...
             </div>
           )}
 

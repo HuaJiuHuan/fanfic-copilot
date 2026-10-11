@@ -52,7 +52,7 @@ export default memo(function WritingView({ project: _project }: WritingViewProps
         </div>
         <div className="flex items-center gap-4">
           <span className="text-xs text-academia-muted">
-            {isSavingDraft ? '保存中...' : '30 秒无操作自动保存'}
+            {isSavingDraft ? '保存中...' : '300 秒无操作自动保存'}
           </span>
           <button
             onClick={saveAllDrafts}
@@ -165,7 +165,7 @@ const SceneEditorPanel = memo(function SceneEditorPanel({
     if (draftContent) {
       autoSaveTimerRef.current = setTimeout(() => {
         saveDraft();
-      }, 30_000);
+      }, 300_000);
     }
     return clearAutoSaveTimer;
   }, [draftContent, activeSceneId, clearAutoSaveTimer, saveDraft]);
