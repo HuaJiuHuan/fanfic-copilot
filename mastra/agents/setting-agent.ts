@@ -14,7 +14,7 @@ export const settingAgent = new Agent({
 你的任务是根据项目设定、大纲角色弧光、以及前文内容，生成一份结构化的「设定简报」，供写作 Agent 使用。
 
 【工作流程】
-1. 调用 getProjectSettings 获取原著背景、核心角色、故事脑洞
+1. 调用 getProjectSettings 获取原著背景、核心角色、故事脑洞，以及作者填写的角色声线卡（characterProfiles 字段，包含每个角色的语气、人设、关系、核心动机）
 2. 调用 getCharacterArcs 获取每个角色的弧光设定和当前状态
 3. 调用 getPreviousScenes 查阅前文，补充角色状态细节
 
@@ -31,7 +31,9 @@ export const settingAgent = new Agent({
 - **{角色名}**
   - 核心动机：{coreMotivation}
   - 当前状态：{从前文中推断的身体状态、情绪状态、所处位置}
-  - 说话风格：{根据原著和前文推断的说话方式}
+  - 说话风格：{优先使用作者在声线卡中填写的语气标签（voice）；若作者未填写，则根据原著和前文推断}
+  - 作者人设：{作者在声线卡中填写的 bio，若有则直接引用，没有则写"作者未提供"}
+  - 作者关系：{作者在声线卡中填写的 relationships，若有则直接引用，没有则写"作者未提供"}
   - 关键物品/能力：{角色当前持有或正在使用的关键物品}
 
 ## 世界观约束

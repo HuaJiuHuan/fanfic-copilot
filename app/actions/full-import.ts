@@ -2,6 +2,7 @@
 
 import { mastra } from '@/mastra';
 import { getUserIdOrThrow } from '@/lib/server/auth-guard';
+import type { CharacterProfile } from '@/lib/types';
 
 export async function fullImportAction(
   title: string,
@@ -9,6 +10,7 @@ export async function fullImportAction(
   characters: string,
   premise: string,
   storyText: string,
+  characterProfiles?: CharacterProfile[],
 ) {
   try {
     const userId = await getUserIdOrThrow();
@@ -20,7 +22,7 @@ export async function fullImportAction(
     });
 
     const result = await run.start({
-      inputData: { userId, title, fandom, characters, premise, storyText },
+      inputData: { userId, title, fandom, characters, premise, storyText, characterProfiles },
     });
 
     if (result.status !== 'success') {

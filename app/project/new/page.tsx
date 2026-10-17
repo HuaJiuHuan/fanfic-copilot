@@ -4,11 +4,35 @@ import { useState } from 'react';
 import { createProjectAction } from '@/app/actions/project';
 import Link from 'next/link';
 
+interface CharProfileInput {
+  name: string;
+  voice: string;
+  bio: string;
+  relationships: string;
+  coreMotivation: string;
+}
+
 export default function NewProjectPage() {
   const [title, setTitle] = useState('');
   const [fandom, setFandom] = useState('');
   const [characters, setCharacters] = useState('');
   const [premise, setPremise] = useState('');
+
+  const [charProfiles, setCharProfiles] = useState<CharProfileInput[]>([
+    { name: '', voice: '', bio: '', relationships: '', coreMotivation: '' },
+  ]);
+
+  const addCharProfile = () => {
+    setCharProfiles((prev) => [...prev, { name: '', voice: '', bio: '', relationships: '', coreMotivation: '' }]);
+  };
+
+  const removeCharProfile = (idx: number) => {
+    setCharProfiles((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const updateCharProfile = (idx: number, field: keyof CharProfileInput, value: string) => {
+    setCharProfiles((prev) => prev.map((c, i) => (i === idx ? { ...c, [field]: value } : c)));
+  };
 
   const handleBandoriPreset = () => {
     setTitle('春日影下的休止符');
@@ -136,6 +160,77 @@ export default function NewProjectPage() {
               className="w-full h-32 resize-none bg-academia-bg border border-academia-border rounded-lg p-3 text-sm text-academia-parchment outline-none focus:border-academia-gold/50 transition-colors leading-relaxed"
               aria-required="true"
             />
+          </div>
+
+          <input type="hidden" name="characterProfiles" value={JSON.stringify(charProfiles.filter((c) => c.name.trim()))} />
+
+          <div className="space-y-3 border-t border-academia-border pt-5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-academia-gold uppercase tracking-widest">
+                🎭 角色工坊 (可选)
+              </label>
+              <button
+                type="button"
+                onClick={addCharProfile}
+                className="text-xs text-academia-muted hover:text-academia-parchment border border-academia-border px-2 py-0.5 rounded transition-colors"
+              >
+                + 添加角色
+              </button>
+            </div>
+            <p className="text-[11px] text-academia-muted/60 -mt-1">
+              为每位角色填写语气标签、人设、关系和核心动机，让你的 AI 助手更好地把控角色声线。
+            </p>
+
+            {charProfiles.map((cp, idx) => (
+              <div key={idx} className="bg-academia-bg/50 border border-academia-border rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-academia-muted uppercase tracking-wider">
+                    角色 #{idx + 1}
+                  </span>
+                  {charProfiles.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeCharProfile(idx)}
+                      className="text-xs text-red-400/60 hover:text-red-400 transition-colors"
+                    >
+                      移除
+                    </button>
+                  )}
+                </div>
+                <input
+                  type="text"
+                  value={cp.name}
+                  onChange={(e) => updateCharProfile(idx, 'name', e.target.value)}
+                  placeholder="角色名"
+                  className="w-full bg-academia-bg border border-academia-border rounded-lg px-3 py-2 text-sm text-academia-parchment outline-none focus:border-academia-gold/50 transition-colors"
+                />
+                <input
+                  type="text"
+                  value={cp.voice}
+                  onChange={(e) => updateCharProfile(idx, 'voice', e.target.value)}
+                  placeholder="语气标签 · 如：慵懒、带刺、句短、尾音下沉"
+                  className="w-full bg-academia-bg border border-academia-border rounded-lg px-3 py-2 text-sm text-academia-parchment outline-none focus:border-academia-gold/50 transition-colors"
+                />
+                <textarea
+                  value={cp.bio}
+                  onChange={(e) => updateCharProfile(idx, 'bio', e.target.value)}
+                  placeholder="人设简介 · 外貌、性格、背景..."
+                  className="w-full h-16 resize-none bg-academia-bg border border-academia-border rounded-lg px-3 py-2 text-sm text-academia-parchment outline-none focus:border-academia-gold/50 transition-colors leading-relaxed"
+                />
+                <textarea
+                  value={cp.relationships}
+                  onChange={(e) => updateCharProfile(idx, 'relationships', e.target.value)}
+                  placeholder="角色关系 · 对A：保护欲… 对B：敌意…"
+                  className="w-full h-16 resize-none bg-academia-bg border border-academia-border rounded-lg px-3 py-2 text-sm text-academia-parchment outline-none focus:border-academia-gold/50 transition-colors leading-relaxed"
+                />
+                <textarea
+                  value={cp.coreMotivation}
+                  onChange={(e) => updateCharProfile(idx, 'coreMotivation', e.target.value)}
+                  placeholder="核心动机 · 该角色在本故事中的驱动力"
+                  className="w-full h-16 resize-none bg-academia-bg border border-academia-border rounded-lg px-3 py-2 text-sm text-academia-parchment outline-none focus:border-academia-gold/50 transition-colors leading-relaxed"
+                />
+              </div>
+            ))}
           </div>
 
           <button

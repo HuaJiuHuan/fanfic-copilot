@@ -12,8 +12,57 @@ import type {
 
 export type { StoryOutline };
 
-export type Project = Omit<typeof projects.$inferSelect, 'tags'> & {
+export type Project = Omit<typeof projects.$inferSelect, 'tags' | 'characterProfiles'> & {
   tags: string | null;
+  characterProfiles: CharacterProfile[];
+};
+
+export interface CharacterProfile {
+  name: string;
+  voice: string;
+  bio: string;
+  relationships: string;
+  coreMotivation: string;
+  voiceCorpus?: VoiceCorpusSample[];
+}
+
+export interface VoiceCorpusSample {
+  id: string;
+  scenario: string;
+  scenarioLabel?: string;
+  axis?: string;
+  hypothesis?: string;
+  lines: CorpusLine[];
+  source: CorpusSource;
+  userNote?: string;
+  rejectedSummary?: string;
+  createdAt: string;
+}
+
+export interface CorpusLine {
+  speaker: string;
+  text: string;
+}
+
+export type CorpusSource =
+  | 'manual'
+  | 'script_extract'
+  | 'scene'
+  | 'chat'
+  | 'interview'
+  | 'preference'
+  | 'import';
+
+export type StrategyMode = 'anchored' | 'soft' | 'advise_only';
+
+export const SOURCE_WEIGHTS: Record<CorpusSource, number> = {
+  manual: 1.0,
+  script_extract: 0.95,
+  scene: 0.72,
+  chat: 0.68,
+  interview: 0.55,
+  preference: 0.50,
+  import: 0.40,
 };
 
 export type OutlineRecord = Omit<typeof outlines.$inferSelect, 'content'> & {

@@ -1,3 +1,6 @@
+import type { CharacterProfile } from '@/lib/types';
+import { buildVoiceBlock } from './corpus.service';
+
 export interface EditorReview {
   verdict: 'approved' | 'needs_revision';
   summary: string;
@@ -53,8 +56,17 @@ export function buildWritingPrompt(params: {
   premise: string;
   sceneInfo: SceneInfo;
   projectId: string;
+  characterProfiles?: CharacterProfile[];
 }): string {
-  const { settingBrief, fandom, characters, premise, sceneInfo, projectId } = params;
+  const { settingBrief, fandom, characters, premise, sceneInfo, projectId, characterProfiles } = params;
+
+  const sceneKeywords = [sceneInfo.location, sceneInfo.plotAction, sceneInfo.conflict, sceneInfo.emotionalShift]
+    .filter(Boolean)
+    .join(' ');
+
+  const voiceBlock = characterProfiles?.length
+    ? `\n【角色声线卡】—— 作者提供的角色语气、人设与关系，写对白时必须对齐\n${buildVoiceBlock(characterProfiles, sceneKeywords)}\n`
+    : '';
 
   return `
 【设定简报】—— 由设定 Agent 生成，请严格遵循其中的角色状态和世界观约束
@@ -64,7 +76,7 @@ ${settingBrief}
 原著背景：${fandom}
 核心角色：${characters}
 故事脑洞：${premise}
-
+${voiceBlock}
 【当前需要撰写的场景任务】
 场景ID：${sceneInfo.sceneId}
 场景序号：第 ${sceneInfo.sceneNumber} 场
@@ -86,8 +98,17 @@ export function buildEditingPrompt(params: {
   sceneInfo: SceneInfo;
   draftText: string;
   projectId: string;
+  characterProfiles?: CharacterProfile[];
 }): string {
-  const { settingBrief, fandom, characters, premise, sceneInfo, draftText, projectId } = params;
+  const { settingBrief, fandom, characters, premise, sceneInfo, draftText, projectId, characterProfiles } = params;
+
+  const sceneKeywords = [sceneInfo.location, sceneInfo.plotAction, sceneInfo.conflict, sceneInfo.emotionalShift]
+    .filter(Boolean)
+    .join(' ');
+
+  const voiceBlock = characterProfiles?.length
+    ? `\n【角色声线卡】—— 审校时请对照此卡检查角色对白是否符合设定语气\n${buildVoiceBlock(characterProfiles, sceneKeywords)}\n`
+    : '';
 
   return `
 【设定简报】—— 审校时请对照此简报检查角色状态是否一致
@@ -97,7 +118,7 @@ ${settingBrief}
 原著背景：${fandom}
 核心角色：${characters}
 故事脑洞：${premise}
-
+${voiceBlock}
 【场景任务要求】
 场景ID：${sceneInfo.sceneId}
 场景序号：第 ${sceneInfo.sceneNumber} 场

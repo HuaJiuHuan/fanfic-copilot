@@ -15,12 +15,19 @@ export async function POST(req: Request) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  const { projectId, fandom, characters, premise, sceneInfo } = (await req.json()) as {
+  const { projectId, fandom, characters, premise, sceneInfo, characterProfiles } = (await req.json()) as {
     projectId: string;
     fandom: string;
     characters: string;
     premise: string;
     sceneInfo: SceneInfo;
+    characterProfiles?: Array<{
+      name: string;
+      voice: string;
+      bio: string;
+      relationships: string;
+      coreMotivation: string;
+    }>;
   };
 
   const [project] = await db
@@ -43,6 +50,7 @@ export async function POST(req: Request) {
           characters,
           premise,
           sceneInfo,
+          characterProfiles,
         })) {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
         }

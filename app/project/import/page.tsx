@@ -6,6 +6,7 @@ import { extractStoryInfoAction } from '@/app/actions/import-story';
 import { fullImportAction } from '@/app/actions/full-import';
 import Link from 'next/link';
 import type { StoryExtraction } from '@/lib/story-extraction-schema';
+import type { CharacterProfile } from '@/lib/types';
 
 export default function ImportStoryPage() {
   const router = useRouter();
@@ -18,6 +19,8 @@ export default function ImportStoryPage() {
   const [importError, setImportError] = useState('');
   const [importStep, setImportStep] = useState('');
 
+  const [characterProfiles, setCharacterProfiles] = useState<CharacterProfile[]>([]);
+
   const handleExtract = async () => {
     if (!storyText.trim()) return;
     setIsExtracting(true);
@@ -26,6 +29,14 @@ export default function ImportStoryPage() {
       const res = await extractStoryInfoAction(storyText);
       if (res.success && res.data) {
         setExtraction(res.data);
+        const profiles = (res.data.characterProfiles || []).map((c) => ({
+          name: c.name || '',
+          voice: c.voice || '',
+          bio: c.bio || '',
+          relationships: c.relationships || '',
+          coreMotivation: '',
+        }));
+        setCharacterProfiles(profiles);
       } else {
         setExtractionError(res.error || '解析失败，请重试。');
       }
@@ -49,7 +60,7 @@ export default function ImportStoryPage() {
     setImportStep('正在创建项目...');
 
     try {
-      const res = await fullImportAction(title, fandom, characters, premise, storyText);
+      const res = await fullImportAction(title, fandom, characters, premise, storyText, characterProfiles);
       if (res.success && res.projectId) {
         setImportStep('导入成功，正在跳转...');
         router.push(`/project/${res.projectId}`);
@@ -233,10 +244,97 @@ export default function ImportStoryPage() {
                 />
               </div>
 
+              {characterProfiles.length > 0 && (
+                <div className="space-y-3 border-t border-academia-gold/20 pt-5">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs font-bold text-academia-gold uppercase tracking-widest">
+                      🎭 角色工坊（AI 提取）
+                    </h3>
+                    <span className="text-[10px] text-academia-muted">
+                      {characterProfiles.length} 个角色 · 可在项目中继续编辑
+                    </span>
+                  </div>
+                  {characterProfiles.map((profile, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-academia-bg/50 border border-academia-border/50 rounded-lg p-4 space-y-3"
+                    >
+                      <input
+                        type="text"
+                        value={profile.name}
+                        onChange={(e) => {
+                          setCharacterProfiles((prev) =>
+                            prev.map((p, i) =>
+                              i === idx ? { ...p, name: e.target.value } : p,
+                            ),
+                          );
+                        }}
+                        placeholder="角色名"
+                        className="w-full bg-transparent text-sm font-bold text-academia-gold outline-none border-b border-academia-border/30 pb-1 focus:border-academia-gold/50 transition-colors"
+                      />
+                      <div className="space-y-2">
+                        <label className="text-[10px] text-academia-muted uppercase tracking-wider">
+                          🗣️ 语气标签
+                        </label>
+                        <textarea
+                          value={profile.voice}
+                          onChange={(e) => {
+                            setCharacterProfiles((prev) =>
+                              prev.map((p, i) =>
+                                i === idx ? { ...p, voice: e.target.value } : p,
+                              ),
+                            );
+                          }}
+                          placeholder="描述说话风格、口头禅、节奏……"
+                          rows={2}
+                          className="w-full bg-academia-bg border border-academia-border rounded-md px-2.5 py-1.5 text-xs text-academia-parchment/80 leading-relaxed resize-none outline-none focus:border-academia-gold/40 transition-colors"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] text-academia-muted uppercase tracking-wider">
+                          📝 人设简介
+                        </label>
+                        <textarea
+                          value={profile.bio}
+                          onChange={(e) => {
+                            setCharacterProfiles((prev) =>
+                              prev.map((p, i) =>
+                                i === idx ? { ...p, bio: e.target.value } : p,
+                              ),
+                            );
+                          }}
+                          placeholder="外貌、性格、背景……"
+                          rows={2}
+                          className="w-full bg-academia-bg border border-academia-border rounded-md px-2.5 py-1.5 text-xs text-academia-parchment/80 leading-relaxed resize-none outline-none focus:border-academia-gold/40 transition-colors"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] text-academia-muted uppercase tracking-wider">
+                          🔗 角色关系
+                        </label>
+                        <textarea
+                          value={profile.relationships}
+                          onChange={(e) => {
+                            setCharacterProfiles((prev) =>
+                              prev.map((p, i) =>
+                                i === idx ? { ...p, relationships: e.target.value } : p,
+                              ),
+                            );
+                          }}
+                          placeholder="对其他角色的态度和关系……"
+                          rows={2}
+                          className="w-full bg-academia-bg border border-academia-border rounded-md px-2.5 py-1.5 text-xs text-academia-parchment/80 leading-relaxed resize-none outline-none focus:border-academia-gold/40 transition-colors"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={() => setExtraction(null)}
+                  onClick={() => { setExtraction(null); setCharacterProfiles([]); }}
                   className="flex-1 bg-academia-surface border border-academia-border text-academia-muted py-3 rounded-lg text-sm font-bold hover:text-academia-parchment hover:border-academia-gold/50 transition-all"
                   aria-label="返回重新导入"
                 >

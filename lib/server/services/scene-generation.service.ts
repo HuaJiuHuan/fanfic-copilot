@@ -7,6 +7,7 @@ import {
   type EditorReview,
   type SceneInfo,
 } from '@/lib/services/prompt.service';
+import type { CharacterProfile } from '@/lib/types';
 
 export interface GenerationEvent {
   phase: string;
@@ -28,12 +29,13 @@ interface GenerateSceneParams {
   characters: string;
   premise: string;
   sceneInfo: SceneInfo;
+  characterProfiles?: CharacterProfile[];
 }
 
 export async function* generateSceneStream(
   params: GenerateSceneParams,
 ): AsyncGenerator<GenerationEvent> {
-  const { projectId, fandom, characters, premise, sceneInfo } = params;
+  const { projectId, fandom, characters, premise, sceneInfo, characterProfiles } = params;
 
   yield { phase: 'setting', status: 'generating' };
 
@@ -50,7 +52,7 @@ export async function* generateSceneStream(
   yield { phase: 'writing', status: 'streaming' };
   const writingAgent = mastra.getAgent('writingAgent');
   const writeStream = await writingAgent.stream(
-    buildWritingPrompt({ settingBrief, fandom, characters, premise, sceneInfo, projectId }),
+    buildWritingPrompt({ settingBrief, fandom, characters, premise, sceneInfo, projectId, characterProfiles }),
     {
       memory: {
         thread: { id: `project-${projectId}`, resourceId: projectId },
@@ -77,6 +79,7 @@ export async function* generateSceneStream(
       sceneInfo,
       draftText,
       projectId,
+      characterProfiles,
     }),
     {
       memory: {

@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer, uniqueIndex, primaryKey } from 'drizzle-orm/sqlite-core';
+import type { CharacterProfile } from '@/lib/types';
 
 export const users = sqliteTable(
   'users',
@@ -100,6 +101,7 @@ export const projects = sqliteTable('projects', {
   publishedAt: integer('published_at', { mode: 'timestamp' }),
   summary: text('summary').default(''),
   tags: text('tags', { mode: 'json' }),
+  characterProfiles: text('character_profiles', { mode: 'json' }).$type<CharacterProfile[]>().default([]),
   hits: integer('hits').default(0),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),

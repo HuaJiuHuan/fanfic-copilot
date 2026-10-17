@@ -12,6 +12,13 @@ interface GenerateRequest {
   fandom: string;
   characters: string;
   premise: string;
+  characterProfiles?: Array<{
+    name: string;
+    voice: string;
+    bio: string;
+    relationships: string;
+    coreMotivation: string;
+  }>;
   sceneInfo: {
     sceneId: string;
     sceneNumber: number;

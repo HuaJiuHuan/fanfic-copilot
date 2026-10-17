@@ -11,7 +11,7 @@ import { AI_CONFIG } from '@/lib/ai-config';
 
 const createProjectStep = createStep({
   id: 'createProject',
-  description: '在数据库中创建项目记录',
+  description: '在数据库中创建项目记录，包含角色声线卡',
   inputSchema: z.object({
     userId: z.string(),
     title: z.string(),
@@ -19,6 +19,17 @@ const createProjectStep = createStep({
     characters: z.string(),
     premise: z.string(),
     storyText: z.string(),
+    characterProfiles: z
+      .array(
+        z.object({
+          name: z.string(),
+          voice: z.string(),
+          bio: z.string(),
+          relationships: z.string(),
+          coreMotivation: z.string(),
+        }),
+      )
+      .optional(),
   }),
   outputSchema: z.object({
     projectId: z.string(),
@@ -28,9 +39,20 @@ const createProjectStep = createStep({
     characters: z.string(),
     premise: z.string(),
     storyText: z.string(),
+    characterProfiles: z
+      .array(
+        z.object({
+          name: z.string(),
+          voice: z.string(),
+          bio: z.string(),
+          relationships: z.string(),
+          coreMotivation: z.string(),
+        }),
+      )
+      .optional(),
   }),
   execute: async ({ inputData }) => {
-    const { userId, title, fandom, characters, premise, storyText } = inputData;
+    const { userId, title, fandom, characters, premise, storyText, characterProfiles } = inputData;
     const projectId = crypto.randomUUID();
     await db.insert(projects).values({
       id: projectId,
@@ -39,8 +61,9 @@ const createProjectStep = createStep({
       fandom,
       characters,
       premise,
+      characterProfiles: characterProfiles || [],
     });
-    return { projectId, userId, title, fandom, characters, premise, storyText };
+    return { projectId, userId, title, fandom, characters, premise, storyText, characterProfiles };
   },
 });
 
@@ -235,6 +258,17 @@ export const fullImportWorkflow = new Workflow({
     characters: z.string(),
     premise: z.string(),
     storyText: z.string(),
+    characterProfiles: z
+      .array(
+        z.object({
+          name: z.string(),
+          voice: z.string(),
+          bio: z.string(),
+          relationships: z.string(),
+          coreMotivation: z.string(),
+        }),
+      )
+      .optional(),
   }),
   outputSchema: z.object({
     projectId: z.string(),

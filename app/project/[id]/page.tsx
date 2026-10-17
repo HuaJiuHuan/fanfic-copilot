@@ -9,6 +9,7 @@ import AppHeader from '@/components/AppHeader';
 import WorkspaceClient from './WorkspaceClient';
 import PublishButton from '@/components/PublishButton';
 import FloatingArchive from '@/components/FloatingArchive';
+import FloatingCharacter from '@/components/FloatingCharacter';
 import type { OutlineRecord } from '@/lib/types';
 
 interface Props {
@@ -67,6 +68,13 @@ export default async function ProjectWorkspacePage({ params }: { params: { id: s
         fandom={project.fandom}
         characters={project.characters}
         premise={project.premise}
+        projectId={project.id}
+      />
+
+      <FloatingCharacter
+        characters={project.characterProfiles || []}
+        projectId={project.id}
+        userName={user?.name || user?.email?.split('@')[0] || '用户'}
       />
 
       <main className="flex-1 w-full max-w-7xl mx-auto p-6 flex flex-col">

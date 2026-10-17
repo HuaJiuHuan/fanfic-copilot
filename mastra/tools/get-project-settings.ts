@@ -24,6 +24,7 @@ export const getProjectSettingsTool = createTool({
       characters: project.characters,
       premise: project.premise,
       title: project.title,
+      characterProfiles: (project.characterProfiles as any[]) || [],
     };
   },
 });

@@ -75,6 +75,7 @@ export const createGenerationSlice: StateCreator<
           fandom: project.fandom,
           characters: project.characters,
           premise: project.premise,
+          characterProfiles: project.characterProfiles,
           sceneInfo: {
             sceneId: activeSceneId,
             sceneNumber: sceneInfo.sceneNumber,
