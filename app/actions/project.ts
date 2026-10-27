@@ -2,12 +2,12 @@
 
 import { cache } from 'react';
 import { db } from '@/lib/db';
-import { projects, outlines } from '@/lib/db-schema';
+import { projects, outlines } from '@/lib/db/schema';
 import { and, desc, eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 import { getProjectsWithStats as fetchProjectsWithStats } from '@/lib/repositories/project.repository';
 import type { ProjectWithStats } from '@/lib/repositories/project.repository';
-import { getUserIdOrThrow, verifyProjectOwnership } from '@/lib/server/auth-guard';
+import { getUserIdOrThrow, verifyProjectOwnership } from '@/lib/auth/guard';
 import type { Project, CharacterProfile } from '@/lib/types';
 
 export { type ProjectWithStats };

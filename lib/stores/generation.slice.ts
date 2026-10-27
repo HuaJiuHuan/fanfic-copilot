@@ -1,7 +1,7 @@
 import type { StateCreator } from 'zustand';
 import { toast } from 'sonner';
-import type { GeneratingPhase, PhaseEvent } from '@/lib/generate-phase-machine';
-import { getNextPhase } from '@/lib/generate-phase-machine';
+import type { GeneratingPhase, PhaseEvent } from '@/lib/ai/phase-machine';
+import { getNextPhase } from '@/lib/ai/phase-machine';
 import { streamGeneration } from '@/lib/services/generation.service';
 import type { WorkspaceSlice, EditorReview } from './workspace.slice';
 import { getActiveSceneInfo } from './workspace.slice';

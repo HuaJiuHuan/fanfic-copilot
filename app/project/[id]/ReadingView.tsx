@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useMemo } from 'react';
-import { useWorkspaceStore, useCurrentOutline } from '@/lib/workspace-store';
+import { useWorkspaceStore, useCurrentOutline } from '@/lib/stores';
 
 function countWords(text: string): number {
   if (!text) return 0;

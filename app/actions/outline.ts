@@ -1,11 +1,11 @@
 'use server';
 
 import { db } from '@/lib/db';
-import { outlines } from '@/lib/db-schema';
+import { outlines } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
-import { StoryOutlineSchema } from '@/lib/schema';
-import { getUserIdOrThrow, verifyProjectOwnership } from '@/lib/server/auth-guard';
+import { StoryOutlineSchema } from '@/lib/validators/story-outline';
+import { getUserIdOrThrow, verifyProjectOwnership } from '@/lib/auth/guard';
 
 export async function updateOutlineAction(id: string, newContent: unknown, projectId: string) {
   const userId = await getUserIdOrThrow();

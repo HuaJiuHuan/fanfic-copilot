@@ -3,11 +3,11 @@
 import { memo, useEffect, useMemo } from 'react';
 import type { Project, OutlineRecord, SceneDraft, TagsData, InteractionState } from '@/lib/types';
 import { recordRead } from '@/app/actions/interaction';
-import InteractionBar from '@/components/InteractionBar';
-import SubscribeButton from '@/components/SubscribeButton';
-import ReadingProgress from '@/components/ReadingProgress';
-import CommentSection from '@/components/CommentSection';
-import { parseTags } from '@/lib/tag-utils';
+import InteractionBar from '@/components/social/InteractionBar';
+import SubscribeButton from '@/components/project/SubscribeButton';
+import ReadingProgress from '@/components/workspace/ReadingProgress';
+import CommentSection from '@/components/social/CommentSection';
+import { parseTags } from '@/lib/utils/tags';
 
 interface Props {
   project: Project;

@@ -1,6 +1,6 @@
 import { getAuthSession } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { projects } from '@/lib/db-schema';
+import { projects } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
 export async function getUserIdOrThrow(): Promise<string> {

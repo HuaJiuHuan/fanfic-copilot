@@ -3,11 +3,11 @@ import { z } from 'zod';
 import { generateObject } from 'ai';
 import { deepseek } from '@ai-sdk/deepseek';
 import { db } from '@/lib/db';
-import { projects, outlines, sceneDrafts } from '@/lib/db-schema';
+import { projects, outlines, sceneDrafts } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
-import { StoryOutlineSchema } from '@/lib/schema';
-import { SceneSplitSchema } from '@/lib/scene-split-schema';
-import { AI_CONFIG } from '@/lib/ai-config';
+import { StoryOutlineSchema } from '@/lib/validators/story-outline';
+import { SceneSplitSchema } from '@/lib/validators/scene-split';
+import { AI_CONFIG } from '@/lib/ai/config';
 
 const createProjectStep = createStep({
   id: 'createProject',

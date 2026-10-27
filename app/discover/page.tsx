@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 import { getAuthSession } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { projects, users, kudos, comments, subscriptions } from '@/lib/db-schema';
+import { projects, users, kudos, comments, subscriptions } from '@/lib/db/schema';
 import { inArray, and, desc, eq, sql } from 'drizzle-orm';
-import AppHeader from '@/components/AppHeader';
+import AppHeader from '@/components/ui/AppHeader';
 import type { Project } from '@/lib/types';
 import DiscoverClient from './DiscoverClient';
 import type { TagStats } from './DiscoverClient';
-import { parseTags } from '@/lib/tag-utils';
+import { parseTags } from '@/lib/utils/tags';
 
 export const metadata: Metadata = {
   title: '作品广场',

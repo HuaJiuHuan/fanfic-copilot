@@ -3,10 +3,10 @@
 import { generateObject } from 'ai';
 import { deepseek } from '@ai-sdk/deepseek';
 import { db } from '@/lib/db';
-import { outlines } from '@/lib/db-schema';
-import { StoryOutlineSchema } from '@/lib/schema';
-import { AI_CONFIG } from '@/lib/ai-config';
-import { getUserIdOrThrow, verifyProjectOwnership } from '@/lib/server/auth-guard';
+import { outlines } from '@/lib/db/schema';
+import { StoryOutlineSchema } from '@/lib/validators/story-outline';
+import { AI_CONFIG } from '@/lib/ai/config';
+import { getUserIdOrThrow, verifyProjectOwnership } from '@/lib/auth/guard';
 
 export async function generateOutlineAction(
   projectId: string,

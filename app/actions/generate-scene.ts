@@ -1,7 +1,7 @@
 'use server';
 
 import { mastra } from '@/mastra';
-import { getUserIdOrThrow, verifyProjectOwnership } from '@/lib/server/auth-guard';
+import { getUserIdOrThrow, verifyProjectOwnership } from '@/lib/auth/guard';
 import {
   buildWritingPrompt,
   buildEditingPrompt,

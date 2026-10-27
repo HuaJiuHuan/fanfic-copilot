@@ -1,7 +1,7 @@
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 import { db } from '@/lib/db';
-import { sceneDrafts } from '@/lib/db-schema';
+import { sceneDrafts } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
 export const getPreviousScenesTool = createTool({

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { extractStoryInfoAction } from '@/app/actions/import-story';
 import { fullImportAction } from '@/app/actions/full-import';
 import Link from 'next/link';
-import type { StoryExtraction } from '@/lib/story-extraction-schema';
+import type { StoryExtraction } from '@/lib/validators/story-extraction';
 import type { CharacterProfile } from '@/lib/types';
 
 export default function ImportStoryPage() {

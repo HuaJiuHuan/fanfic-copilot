@@ -1,7 +1,7 @@
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 import { db } from '@/lib/db';
-import { outlines, sceneDrafts } from '@/lib/db-schema';
+import { outlines, sceneDrafts } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
 export const getCharacterArcsTool = createTool({

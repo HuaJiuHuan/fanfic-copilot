@@ -2,7 +2,7 @@
 
 import { generateText } from 'ai';
 import { deepseek } from '@ai-sdk/deepseek';
-import { AI_CONFIG } from '@/lib/ai-config';
+import { AI_CONFIG } from '@/lib/ai/config';
 import type { CharacterProfile, CorpusLine } from '@/lib/types';
 
 interface ThreeVariant {

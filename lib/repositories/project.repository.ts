@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { projects, outlines, sceneDrafts, kudos, comments } from '@/lib/db-schema';
+import { projects, outlines, sceneDrafts, kudos, comments } from '@/lib/db/schema';
 import { desc, inArray, eq, sql } from 'drizzle-orm';
 
 export interface ProjectWithStats {

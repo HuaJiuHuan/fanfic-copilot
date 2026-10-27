@@ -1,8 +1,8 @@
-import { generateSceneStream } from '@/lib/server/services/scene-generation.service';
+import { generateSceneStream } from '@/lib/services/scene-generation.service';
 import type { SceneInfo } from '@/lib/services/prompt.service';
 import { getAuthSession } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { projects } from '@/lib/db-schema';
+import { projects } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
 export const runtime = 'nodejs';

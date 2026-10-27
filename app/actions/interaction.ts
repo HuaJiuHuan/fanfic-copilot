@@ -2,9 +2,9 @@
 
 import { cache } from 'react';
 import { db } from '@/lib/db';
-import { kudos, subscriptions, projects, readingHistory, comments } from '@/lib/db-schema';
+import { kudos, subscriptions, projects, readingHistory, comments } from '@/lib/db/schema';
 import { and, desc, eq, sql } from 'drizzle-orm';
-import { getUserIdOrThrow } from '@/lib/server/auth-guard';
+import { getUserIdOrThrow } from '@/lib/auth/guard';
 import { revalidatePath } from 'next/cache';
 import type { InteractionState, Kudos, Subscription, ReadingHistory } from '@/lib/types';
 import { createNotification } from '@/app/actions/notifications';

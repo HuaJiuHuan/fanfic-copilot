@@ -1,7 +1,7 @@
 'use server';
 
 import { mastra } from '@/mastra';
-import { getUserIdOrThrow } from '@/lib/server/auth-guard';
+import { getUserIdOrThrow } from '@/lib/auth/guard';
 import type { CharacterProfile } from '@/lib/types';
 
 export async function fullImportAction(

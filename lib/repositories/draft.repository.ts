@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { sceneDrafts } from '@/lib/db-schema';
+import { sceneDrafts } from '@/lib/db/schema';
 import { and, eq } from 'drizzle-orm';
 
 export async function getDraftsByOutline(projectId: string, outlineId: string) {

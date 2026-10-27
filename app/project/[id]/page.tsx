@@ -1,15 +1,15 @@
 import { getProjectById } from '@/app/actions/project';
 import { db } from '@/lib/db';
-import { outlines } from '@/lib/db-schema';
+import { outlines } from '@/lib/db/schema';
 import { desc, eq } from 'drizzle-orm';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getAuthSession } from '@/lib/auth';
-import AppHeader from '@/components/AppHeader';
+import AppHeader from '@/components/ui/AppHeader';
 import WorkspaceClient from './WorkspaceClient';
-import PublishButton from '@/components/PublishButton';
-import FloatingArchive from '@/components/FloatingArchive';
-import FloatingCharacter from '@/components/FloatingCharacter';
+import PublishButton from '@/components/project/PublishButton';
+import FloatingArchive from '@/components/workspace/FloatingArchive';
+import FloatingCharacter from '@/components/workspace/FloatingCharacter';
 import type { OutlineRecord } from '@/lib/types';
 
 interface Props {

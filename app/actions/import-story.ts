@@ -2,8 +2,8 @@
 
 import { generateObject } from 'ai';
 import { deepseek } from '@ai-sdk/deepseek';
-import { StoryExtractionSchema } from '@/lib/story-extraction-schema';
-import { AI_CONFIG } from '@/lib/ai-config';
+import { StoryExtractionSchema } from '@/lib/validators/story-extraction';
+import { AI_CONFIG } from '@/lib/ai/config';
 
 export async function extractStoryInfoAction(storyText: string) {
   if (!storyText || storyText.trim().length < 50) {

@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { useWorkspaceStore } from '@/lib/workspace-store';
+import { useWorkspaceStore } from '@/lib/stores';
 
 export default memo(function GenerateButton() {
   const generateOutline = useWorkspaceStore((s) => s.generateOutline);

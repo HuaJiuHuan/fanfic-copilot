@@ -1,4 +1,4 @@
-import { RenderThrottle } from '@/lib/stream-buffer';
+import { RenderThrottle } from '@/lib/utils/stream-buffer';
 
 interface GenerationCallbacks {
   onChunk: (accumulated: string) => void;

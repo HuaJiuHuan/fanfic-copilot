@@ -1,12 +1,12 @@
 import { getAuthSession } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { projects, users, outlines, sceneDrafts } from '@/lib/db-schema';
+import { projects, users, outlines, sceneDrafts } from '@/lib/db/schema';
 import { desc, eq } from 'drizzle-orm';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import type { OutlineRecord, SceneDraft, Project } from '@/lib/types';
 import { getInteractionState } from '@/app/actions/interaction';
-import AppHeader from '@/components/AppHeader';
+import AppHeader from '@/components/ui/AppHeader';
 import StoryReader from './StoryReader';
 
 interface Props {

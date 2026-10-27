@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import Credentials from '@auth/core/providers/credentials';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
 import { db } from '@/lib/db';
-import { users } from '@/lib/db-schema';
+import { users } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 

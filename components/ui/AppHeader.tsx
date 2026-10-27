@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
-import NotificationBell from '@/components/NotificationBell';
+import NotificationBell from '@/components/social/NotificationBell';
 
 interface BreadcrumbItem {
   label: string;

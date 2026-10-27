@@ -1,4 +1,4 @@
-import type { StoryOutline } from '@/lib/schema';
+import type { StoryOutline } from '@/lib/validators/story-outline';
 import type {
   outlines,
   projects,
@@ -8,7 +8,7 @@ import type {
   subscriptions,
   readingHistory,
   notifications,
-} from '@/lib/db-schema';
+} from '@/lib/db/schema';
 
 export type { StoryOutline };
 

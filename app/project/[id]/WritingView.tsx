@@ -2,10 +2,10 @@
 
 import { memo, useRef, useEffect, useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { useWorkspaceStore, useCurrentOutline, useActiveSceneInfo } from '@/lib/workspace-store';
+import { useWorkspaceStore, useCurrentOutline, useActiveSceneInfo } from '@/lib/stores';
 import type { Project } from '@/lib/types';
-import type { EditorReview } from '@/lib/workspace-store';
-import type { GeneratingPhase } from '@/lib/generate-phase-machine';
+import type { EditorReview } from '@/lib/stores';
+import type { GeneratingPhase } from '@/lib/ai/phase-machine';
 
 // ==================== 类型定义 ====================
 

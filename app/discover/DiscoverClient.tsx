@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import type { TagsData, Project } from '@/lib/types';
-import { parseTags } from '@/lib/tag-utils';
+import { parseTags } from '@/lib/utils/tags';
 
 function TagBadges({ tags }: { tags: TagsData }) {
   return (

@@ -1,7 +1,7 @@
 'use client';
 
 import { memo, useEffect } from 'react';
-import { useWorkspaceStore } from '@/lib/workspace-store';
+import { useWorkspaceStore } from '@/lib/stores';
 import type { OutlineRecord, Project } from '@/lib/types';
 import OutlineView from './OutlineView';
 import WritingView from './WritingView';

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { StreamBuffer, RenderThrottle } from '@/lib/stream-buffer';
+import { StreamBuffer, RenderThrottle } from '@/lib/utils/stream-buffer';
 
 function mockRAF() {
   vi.useFakeTimers();

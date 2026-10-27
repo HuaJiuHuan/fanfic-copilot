@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { useWorkspaceStore, useDisplayData } from '@/lib/workspace-store';
+import { useWorkspaceStore, useDisplayData } from '@/lib/stores';
 import type { Project } from '@/lib/types';
 import OutlineSwitcher from './OutlineSwitcher';
 

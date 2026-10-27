@@ -2,9 +2,9 @@
 
 import { cache } from 'react';
 import { db } from '@/lib/db';
-import { notifications, users } from '@/lib/db-schema';
+import { notifications, users } from '@/lib/db/schema';
 import { desc, eq, and, sql } from 'drizzle-orm';
-import { getUserIdOrThrow } from '@/lib/server/auth-guard';
+import { getUserIdOrThrow } from '@/lib/auth/guard';
 import { revalidatePath } from 'next/cache';
 import type { NotificationWithActor } from '@/lib/types';
 

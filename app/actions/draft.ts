@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { getDraftsByOutline, upsertDraft } from '@/lib/repositories/draft.repository';
-import { getUserIdOrThrow, verifyProjectOwnership } from '@/lib/server/auth-guard';
+import { getUserIdOrThrow, verifyProjectOwnership } from '@/lib/auth/guard';
 
 export async function getDraftsByOutlineAction(projectId: string, outlineId: string) {
   const userId = await getUserIdOrThrow();

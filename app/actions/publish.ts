@@ -2,9 +2,9 @@
 
 import { cache } from 'react';
 import { db } from '@/lib/db';
-import { projects, subscriptions } from '@/lib/db-schema';
+import { projects, subscriptions } from '@/lib/db/schema';
 import { and, desc, eq } from 'drizzle-orm';
-import { getUserIdOrThrow } from '@/lib/server/auth-guard';
+import { getUserIdOrThrow } from '@/lib/auth/guard';
 import type { TagsData } from '@/lib/types';
 import { createNotification } from '@/app/actions/notifications';
 

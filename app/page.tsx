@@ -2,37 +2,14 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getProjectsWithStats } from '@/app/actions/project';
 import { getAuthSession } from '@/lib/auth';
-import AppHeader from '@/components/AppHeader';
-import DeleteProjectButton from '@/components/DeleteProjectButton';
+import { formatWords, getRelativeTime } from '@/lib/utils/format';
+import AppHeader from '@/components/ui/AppHeader';
+import DeleteProjectButton from '@/components/project/DeleteProjectButton';
 
 export const metadata: Metadata = {
   title: '我的灵感档案室',
   description: '所有世界线在此收束。管理你的同人小说项目，开始新的创作之旅。',
 };
-
-function formatWords(count: number): string {
-  if (count >= 10000) {
-    return `${(count / 10000).toFixed(1)}万字`;
-  }
-  if (count >= 1000) {
-    return `${(count / 1000).toFixed(1)}千字`;
-  }
-  return `${count}字`;
-}
-
-function getRelativeTime(date: Date | null): string {
-  if (!date) return '未知';
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  if (diffMins < 1) return '刚刚';
-  if (diffMins < 60) return `${diffMins}分钟前`;
-  const diffHours = Math.floor(diffMins / 60);
-  if (diffHours < 24) return `${diffHours}小时前`;
-  const diffDays = Math.floor(diffHours / 24);
-  if (diffDays < 30) return `${diffDays}天前`;
-  return date.toLocaleDateString('zh-CN');
-}
 
 export default async function DashboardPage() {
   const session = await getAuthSession();
